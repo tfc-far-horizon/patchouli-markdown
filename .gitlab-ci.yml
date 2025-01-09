@@ -38,10 +38,11 @@ build-wasm:
 build-ffi:
   stage: build
   script:
-    - make dist/ghc_wasm_jsffi.js
+    - make dist/ghc_wasm_jsffi.mjs
     - make dist/wizer.wasm
 
 build-docs:
   stage: build
   script:
-    - make docs
+    - make docspath
+    - make docsmade
