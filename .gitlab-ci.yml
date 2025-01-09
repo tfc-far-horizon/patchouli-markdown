@@ -33,16 +33,23 @@ build-wasm:
     when: on_success
     access: all
     paths:
-      - "dist"
+      - "dist/"
+      - "dist-newstyle/"
 
 build-ffi:
   stage: build
   script:
     - make dist/ghc_wasm_jsffi.mjs
     - make dist/wizer.wasm
+  artifacts:
+    paths:
+      - "dist/"
 
 build-docs:
   stage: build
   script:
     - make docspath
     - make docsmade
+  artifacts:
+    paths:
+      - "dist/"
