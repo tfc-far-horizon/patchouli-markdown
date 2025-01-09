@@ -16,16 +16,15 @@ endef
 #   wasm-tools strip -o dist/bin.wasm dist/bin.wasm
 
 define WIZER
-	[ -f "$$HOME/.ghc-wasm/env" ] && . "$$HOME/.ghc-wasm/env"; \
-	env -i GHCRTS=-H64m "$$(type -P wizer)" \
+	env -i GHCRTS=-H64m $$HOME/.ghc-wasm/wasmtime/bin/wizer \
 		--allow-wasi \
 		--wasm-bulk-memory true \
 		--inherit-env true \
 		--init-func _initialize \
 		-o $(2) \
 		$(1) && \
-	wasm-opt $(2) -o $(2); \
-	wasm-tools strip -o $(2) $(2);
+	$$HOME/.ghc-wasm/binaryen/bin/wasm-opt $(2) -o $(2); \
+	$$HOME/.ghc-wasm/wasmtime/bin/wasm-tools strip -o $(2) $(2);
 endef
 
 define NVM
@@ -69,6 +68,7 @@ $(DOCS)/%.pdf: $(TEXTEMPDIR)/%.pdf
 # make wasms
 
 wasm-dists: distpath $(DIST)/compiler.wasm $(DIST)/analyser.wasm $(DIST)/ghc_wasm_jsffi.mjs $(DIST)/wizer.wasm
+	@echo all bindists made
 
 distpath:
 	@mkdir -p $(DIST)
