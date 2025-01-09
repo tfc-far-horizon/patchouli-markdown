@@ -26,6 +26,8 @@ build-wasm:
     - make distpath
     - make dist/compiler.wasm
     - make dist/analyser.wasm
+    - make dist/wizer.wasm
+    - make dist/ghc_wasm_jsffi.mjs
   only:
     - main
   artifacts:
@@ -36,15 +38,6 @@ build-wasm:
       - "dist/"
       - "dist-newstyle/"
 
-build-ffi:
-  stage: build
-  script:
-    - make dist/ghc_wasm_jsffi.mjs
-    - make dist/wizer.wasm
-  artifacts:
-    paths:
-      - "dist/"
-
 build-docs:
   stage: build
   script:
@@ -52,4 +45,4 @@ build-docs:
     - make docsmade
   artifacts:
     paths:
-      - "dist/"
+      - "docs/"

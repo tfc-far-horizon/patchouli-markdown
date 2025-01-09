@@ -14,7 +14,7 @@ type Analyser = Parsec
   [String] -- 存放warning的位置
 
 warn :: Analyser a -> String -> Analyser a
-warn p s = modifyState (s:) >> p
+warn p s = modifyState (s:) *> p
 
 parse :: Analyser a -> String -> String -> Either ParseError (a, [String])
 parse p name input = runParser p' [] name input
