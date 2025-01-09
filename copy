@@ -1,3 +1,2 @@
-echo "targets:" $@
-echo "\$1:" $1
-wasm32-wasi-cabal list-bin $1 | xargs -I {} cp {} ./dist;
+echo "targets:" $TARGET
+wasm32-wasi-cabal list-bin $TARGET | xargs -I {} cp {} ./dist;
