@@ -80,7 +80,7 @@ $(DIST)/%.wasm: $(wildcard src/*.lhs) $(wildcard src/*.hs) igem-markdown.cabal
 	@echo 
 	$(call CABAL, build, $(notdir $(basename $@)))
 	@echo $(GREEN)copy/register ..$(RESET)
-	find dist-newstyle -name $(notdir $(basename $@)) 
+	find dist-newstyle -name $(notdir $(basename $@)) -exec cp {} ./${DIST}/ \;
 	@echo $(GREEN)done$(RESET)
 
 $(DIST)/ghc_wasm_jsffi.mjs: $(DIST)/analyser.wasm
