@@ -9,7 +9,7 @@ TEXTEMPDIR = texworks
 # CABAL = if command -v wasm32-wasi-cabal &>/dev/null; then wasm32-wasi-cabal; else cabal --with-compiler=
 define CABAL
 	[ -f "$$HOME/.ghc-wasm/env" ] && . "$$HOME/.ghc-wasm/env"; \
-	wasm32-wasi-cabal $(1) $(2) $(3);
+	wasm32-wasi-cabal $(1) $(2) $(3)
 endef
 
 #   env -i GHCRTS=-H64m "$(type -P wizer)" --allow-wasi --wasm-bulk-memory true --inherit-env true --init-func _initialize -o dist/bin.wasm "$hs_wasm_path"
