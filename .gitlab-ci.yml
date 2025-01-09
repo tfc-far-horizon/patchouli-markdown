@@ -26,4 +26,11 @@ build-job:       # This job runs in the build stage, which runs first.
     - make all
   only:
     - main
+  artifacts:
+    untracked: false
+    when: on_success
+    access: all
+    paths:
+      - "dist"
+      - "docs"
 
