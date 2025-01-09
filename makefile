@@ -8,7 +8,6 @@ TEXTEMPDIR = texworks
 
 # CABAL = if command -v wasm32-wasi-cabal &>/dev/null; then wasm32-wasi-cabal; else cabal --with-compiler=
 define CABAL
-	[ -f "$$HOME/.ghc-wasm/env" ] && . "$$HOME/.ghc-wasm/env"; \
 	wasm32-wasi-cabal $(1) $(2) $(3)
 endef
 
@@ -81,7 +80,7 @@ $(DIST)/%.wasm: $(wildcard src/*.lhs) $(wildcard src/*.hs) igem-markdown.cabal
 	@echo 
 	$(call CABAL, build, $(notdir $(basename $@)))
 	@echo $(GREEN)copy/register ..$(RESET)
-	$(call CABAL, list-bin, $(notdir $(basename $@)), 2>/dev/null) | xargs -I {} cp {} ./$(DIST)/ ;
+	cp $(shell $(call CABAL, build, $(notdir $(basename $@)))) ./$(DIST)/ ;
 	@echo $(GREEN)done$(RESET)
 
 $(DIST)/ghc_wasm_jsffi.mjs: $(DIST)/analyser.wasm
