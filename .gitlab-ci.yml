@@ -23,11 +23,7 @@ stages:          # List of stages for jobs, and their order of execution
 build-wasm:
   stage: build
   script:
-    - make distpath
-    - make dist/compiler.wasm
-    - make dist/analyser.wasm
-    - make dist/wizer.wasm
-    - make dist/ghc_wasm_jsffi.mjs
+    - make all
   only:
     - main
   artifacts:
@@ -36,13 +32,4 @@ build-wasm:
     access: all
     paths:
       - "dist/"
-      - "dist-newstyle/"
-
-build-docs:
-  stage: build
-  script:
-    - make docspath
-    - make docsmade
-  artifacts:
-    paths:
       - "docs/"
