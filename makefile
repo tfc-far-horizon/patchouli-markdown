@@ -4,6 +4,7 @@ RED :=
 RESET := 
 BLUE := 
 
+export SHELL=/bin/bash
 TEXTEMPDIR = texworks
 
 # CABAL = if command -v wasm32-wasi-cabal &>/dev/null; then wasm32-wasi-cabal; else cabal --with-compiler=
@@ -57,7 +58,6 @@ $(TEXTEMPDIR)/%.tex: $(SRC)/%.lhs ./lhs2tex.header
 $(TEXTEMPDIR)/%.pdf: $(TEXTEMPDIR)/%.tex
 	@echo
 	sed -i "s/\\documentclass{article}/\\documentclass{ctexart}/" $<
-	sed -i "s/$$\\end{document}/\\end{document}/" $<
 	$(TEX) $<
 
 $(DOCS)/%.pdf: $(TEXTEMPDIR)/%.pdf
