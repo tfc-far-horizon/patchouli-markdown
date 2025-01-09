@@ -1,3 +1,0 @@
-echo "targets:" $TARGET
-SOURCE=$(wasm32-wasi-cabal list-bin $TARGET)
-cp $SOURCE ./dist/

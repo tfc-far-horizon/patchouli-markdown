@@ -1,1 +1,0 @@
-(cat ./lhs2tex.header && cat $1 && echo $$'\\end{document}') | lhs2TeX --poly > $2
