@@ -53,7 +53,7 @@ docsmade: $(patsubst $(SRC)/%.lhs,$(DOCS)/%.pdf,$(wildcard $(SRC)/*.lhs))
 	@echo all docs made
 
 $(TEXTEMPDIR)/%.tex: $(SRC)/%.lhs ./lhs2tex.header
-	. ./entitle $< $@
+	$(shell (cat ./lhs2tex.header && cat $< && echo $$'\\end{document}') | lhs2TeX --poly > $@)
 
 $(TEXTEMPDIR)/%.pdf: $(TEXTEMPDIR)/%.tex
 	@echo
