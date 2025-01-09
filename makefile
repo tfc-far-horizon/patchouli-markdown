@@ -57,6 +57,7 @@ $(TEXTEMPDIR)/%.tex: $(SRC)/%.lhs ./lhs2tex.header
 $(TEXTEMPDIR)/%.pdf: $(TEXTEMPDIR)/%.tex
 	@echo
 	sed -i "s/\\documentclass{article}/\\documentclass{ctexart}/" $<
+	sed -i "s/$$\\end{document}/\\end{document}" $<
 	$(TEX) $<
 
 $(DOCS)/%.pdf: $(TEXTEMPDIR)/%.pdf
