@@ -1,2 +1,3 @@
 echo "targets:" $TARGET
-wasm32-wasi-cabal list-bin $TARGET | xargs -I {} cp {} ./dist;
+SOURCE=$(wasm32-wasi-cabal list-bin $TARGET)
+cp $SOURCE ./dist/
