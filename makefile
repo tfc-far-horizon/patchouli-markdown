@@ -53,7 +53,7 @@ docsmade: $(patsubst $(SRC)/%.lhs,$(DOCS)/%.pdf,$(wildcard $(SRC)/*.lhs))
 	@echo all docs made
 
 $(TEXTEMPDIR)/%.tex: $(SRC)/%.lhs ./lhs2tex.header
-	$(shell (cat ./lhs2tex.header && cat $< && echo $$'\\end{document}') | $(LHS2TEX) --poly > $@)
+	. ./entitle $< $@
 
 $(TEXTEMPDIR)/%.pdf: $(TEXTEMPDIR)/%.tex
 	@echo
@@ -80,7 +80,7 @@ $(DIST)/%.wasm: $(wildcard src/*.lhs) $(wildcard src/*.hs) igem-markdown.cabal
 	@echo 
 	$(call CABAL, build, $(notdir $(basename $@)))
 	@echo $(GREEN)copy/register ..$(RESET)
-	cp $(shell $(call CABAL, build, $(notdir $(basename $@)))) ./$(DIST)/ ;
+	. ./copy %;
 	@echo $(GREEN)done$(RESET)
 
 $(DIST)/ghc_wasm_jsffi.mjs: $(DIST)/analyser.wasm
