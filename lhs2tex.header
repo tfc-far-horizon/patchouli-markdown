@@ -1,0 +1,13 @@
+\documentclass{article}
+%include lhs2TeX.fmt
+%include lhs2TeX.sty
+%format <|>  = "<\hspace{-0.5em}|\hspace{-0.5em}>"
+%format <*>  = "<\hspace{-0.5em}*\hspace{-0.5em}>"
+%format  *>  = "*\hspace{-0.5em}>"
+%format <*   = "<\hspace{-0.5em}*"
+%format <?>  = "error:"
+%format <$   = "<\hspace{-0.5em}{\small\$}"
+%format  $>  = "{\small\$}\hspace{-0.5em}>"
+%format <$>  = "<\hspace{-0.5em}{\small\$}\hspace{-0.5em}>"
+
+\begin{document}

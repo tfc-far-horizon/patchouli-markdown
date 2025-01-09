@@ -1,0 +1,11 @@
+dist/
+dist-newstyle/
+texworks/
+docs/
+
+.vscode/
+*.sublime-*
+
+*lock*
+node_modules/
+web/
