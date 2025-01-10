@@ -33,3 +33,13 @@ build-wasm:
     paths:
       - "dist/"
       - "docs/"
+
+build-linux:
+  stage: build
+  script:
+    - cabal build compiler
+    - mkdir ./bindist/
+    - cabal list-bin compiler | xargs -I {} cp {} ./bindist/
+  artifacts:
+    paths:
+      - "bindist/"
