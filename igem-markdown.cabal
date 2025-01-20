@@ -20,7 +20,7 @@ name:               igem-markdown
 -- PVP summary:     +-+------- breaking API changes
 --                  | | +----- non-breaking API additions
 --                  | | | +--- code changes with no API change
-version:            0.2.0.0
+version:            0.3.0.0
 
 -- A short (one-line) description of the package.
 -- synopsis:
@@ -91,5 +91,5 @@ executable analyser
     ghc-options:
         -no-hs-main
         -optl-mexec-model=reactor
-        "-optl-Wl,--export=hs_init,--export=parse,--export=correct,--export=consoleLog,--export=problems"
+        "-optl-Wl,--export=hs_init,--export=parse,--export=problems"
 
