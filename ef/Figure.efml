@@ -1,0 +1,4 @@
+>div.imarkdown.figure
+    >img
+        #src={{ path }}
+    -caption

@@ -1,0 +1,7 @@
+>div.imarkdown.section
+    >p.imarkdown.section-title
+        >h3.imarkdown.section-title
+            .{{ title }}
+        >span.imarkdown.date
+            .{{ date }}
+    +content
