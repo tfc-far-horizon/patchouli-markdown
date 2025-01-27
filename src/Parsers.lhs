@@ -4,7 +4,7 @@ Parsers 模块定义了各个层级的 Parser，
 所有 Parser 有共同的签名： Analyser Ast
 
 \begin{code}
-module Parsers (article, parse) where
+module Parsers (article, parse, section) where
 
 import Ast
 import Text.Parsec hiding (parse)
@@ -350,19 +350,25 @@ enumeration = enumeration' 0
 
 \begin{code}
 
+parseDay :: [CharUnit] -> Analyser (Maybe Day)
+parseDay d = case parse day "date" $
+  map fst $ d of
+    Right date -> return $ Just $ fst date
+    Left _ -> return Nothing
+
 sectionTitle :: Analyser (String, Maybe Day)
 sectionTitle = do
-  title <-
-    many (try $ noneUnitOf [('#', False), ('\n', False)])
-      `sepBy` charUnit ('#', False)
-  case title of
-    [] -> error "unlikely branch"
-    _ : [] -> unexpected "none title"
-    _ : title : rest -> case parse day "date" $
-      map fst $
-        head rest of
-      Right date -> return (map fst title, Just $ fst date)
-      Left _ -> return (map fst title, Nothing)
+  charUnit ('#', False)
+  title <- t
+  date <- choice $
+    [ charUnit ('#', False) *> t,
+      return $ toUnitString ""
+    ]
+  day <- parseDay date
+  charUnit ('\n', False)
+  return (map fst title, day)
+  where
+    t = many (try $ noneUnitOf [('#', False),('\n', False)])
 
 day :: Analyser Day
 day = do

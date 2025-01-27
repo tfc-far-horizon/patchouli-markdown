@@ -94,4 +94,9 @@ cleandocs:
 restart: cleandocs
 	-rm -rf $(DIST)
 
-.PHONY: all cleandocs restart docspath distpath
+.PHONY: all cleandocs restart docspath distpath bin
+
+bin:
+	-mkdir ./bindist
+	cabal build compiler
+	cabal list-bin compiler | xargs -I {} cp {} ./bindist
