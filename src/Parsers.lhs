@@ -78,7 +78,7 @@ charUnit (c, b) = do
   (c', b') <- anyCharUnit
   if c == c' && b == b'
     then return (c, b)
-    else unexpected $ [c']
+    else unexpected $ show [c'] ++ "expecting" ++ show c
 
 toUnit :: Char -> CharUnit
 toUnit c = (c, False)
@@ -119,7 +119,7 @@ inlinemd m = do
   content <- Plain . map fst <$> many (try (noneUnitOf symbols'))
   symbol <- lookAhead anyCharUnit
   if Just symbol == m
-    then charUnit symbol *> return content
+    then charUnit symbol *> return (Paragraph [content])
     else case symbol of
       ('$', False) -> content `prepend` inlineMath
       ('[', True) ->
@@ -197,7 +197,7 @@ inlineMath = do
   formula <-
     concat . map withslash
       <$> many (try $ noneUnitOf [('$', False), ('\n', False)])
-  (try $ charUnit ('$', False)) `warn` unlines 
+  (try $ charUnit ('$', False)) <|> return ('$', False) `warn` unlines 
     [ "unenclosed inline math environment",
       "note: math env began at" ++ show pos
     ]
@@ -213,7 +213,7 @@ displayMath = do
   ((try $ charUnit (']', True)) <|>) $
     unexpected . unlines $
       [ "unenclosed display math environment,",
-        "note: math env began at" ++ show pos
+        "note: math env began at " ++ show pos
       ]
   return . Math formula $ True
 
@@ -237,10 +237,8 @@ link = do
   text <-
     charUnit ('[', False)
       *> inlinemd (Just (']', False))
-  link <-
-    charUnit ('(', False)
-      *> inlinemd (Just (')', False))
-  return . Link text $ plaintext $ link
+  link <- between (charUnit ('(', False)) (charUnit (')', False)) $ many $ try $ noneUnitOf [(')',False),('\n',False)]
+  return . Link text $ map fst $ link
 
 figure :: Analyser Ast
 figure = do
@@ -259,8 +257,9 @@ figure = do
 
 emphasis :: CharUnit -> Analyser Ast
 emphasis symbol = do
-  emphasised <-
-    between (charUnit symbol) (charUnit symbol) $ inlinemd (Just symbol)
+  emphasised <- do
+    charUnit symbol
+    inlinemd (Just symbol)
   return . Emphasis emphasised $ case fst symbol of
     '_' -> UnderLined
     '*' -> Italic
@@ -294,7 +293,7 @@ directItem :: Analyser Ast
 directItem = oneOf "+-" *> char ' ' *> inlinemd Nothing
 
 directEnum :: Analyser Ast
-directEnum = many digit *> char '.' *> inlinemd Nothing
+directEnum = many digit *> char '.' *> char ' ' *> inlinemd Nothing
 
 indirect :: Analyser Ast
 indirect = displayMath <|> figure <|> inlinemd Nothing
@@ -351,24 +350,30 @@ enumeration = enumeration' 0
 \begin{code}
 
 parseDay :: [CharUnit] -> Analyser (Maybe Day)
-parseDay d = case parse day "date" $
-  map fst $ d of
-    Right date -> return $ Just $ fst date
-    Left _ -> return Nothing
+parseDay d = do
+  pos <- getPosition
+  case parse day "date" $
+    map fst $ d of
+      Right date -> return $ Just $ fst date
+      Left _ -> return Nothing `warn` unlines
+        [ "Invalid date format at " ++ show pos,
+          "\tnote: everything after the second '#' will be dropped.",
+          "\tnote: Date should take the `YYYY-MM-DD' format"
+        ]
 
 sectionTitle :: Analyser (String, Maybe Day)
 sectionTitle = do
   charUnit ('#', False)
-  title <- t
+  title <- t "#\n"
   date <- choice $
-    [ charUnit ('#', False) *> t,
+    [ charUnit ('#', False) *> t "\n",
       return $ toUnitString ""
     ]
   day <- parseDay date
   charUnit ('\n', False)
   return (map fst title, day)
   where
-    t = many (try $ noneUnitOf [('#', False),('\n', False)])
+    t s = many (try $ noneUnitOf $ toUnitString s)
 
 day :: Analyser Day
 day = do

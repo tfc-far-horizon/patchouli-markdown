@@ -68,7 +68,10 @@ instance ToJSON Ast where
   toJSON (Paragraph asts) =
     object
       [ "type" .:: "paragraph",
-        "content" .= asts
+        "content" .= filter (\ast -> case ast of
+          Plain "" -> False
+          _ -> True
+        ) asts
       ]
   toJSON (Section title date content) =
     object
