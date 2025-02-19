@@ -145,7 +145,7 @@ inlinemd m = do
           (Link _ _) ->
             return . Paragraph $
               content : prependee : inline : inlines
-          (Plain t) -> case inline of
+          (Paragraph [(Plain t)]) -> case inline of
             (Plain t') ->
               return . Paragraph $
                 (Plain (plaintext content ++ t ++ t')) : inlines
@@ -237,7 +237,10 @@ link = do
   text <-
     charUnit ('[', False)
       *> inlinemd (Just (']', False))
-  link <- between (charUnit ('(', False)) (charUnit (')', False)) $ many $ try $ noneUnitOf [(')',False),('\n',False)]
+  link <- 
+    charUnit ('(', False) *>
+      (many $ try $ noneUnitOf [(')',False),('\n',False)])
+      <* charUnit (')', False)
   return . Link text $ map fst $ link
 
 figure :: Analyser Ast
