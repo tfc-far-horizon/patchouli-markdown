@@ -140,8 +140,6 @@ instance ToJSON Ast where--为 Ast 提供了 ToJSON 实例，定义了如何将 
               in String mode,
         "content" .= f
       ]
---       类型为 "math"。
--- 包含公式内容和显示模式（display 或 inline）。
   toJSON (Plain t) =
     object
       [ "type" .:: "plain",
