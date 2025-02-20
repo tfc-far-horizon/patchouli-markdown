@@ -214,3 +214,40 @@ bin:
 # cabal build compiler：使用 Cabal 构建 compiler 项目。
 # 复制可执行文件：
 # cabal list-bin compiler | xargs -I {} cp {} ./bindist：将 compiler 项目生成的可执行文件复制到 bindist 目录。
+
+
+
+
+
+
+
+# lhs2.header的注释补充在这里：
+# 在 Makefile 中，有一行是这样的：
+# makefile
+# $(TEXTEMPDIR)/%.tex: $(SRC)/%.lhs ./lhs2tex.header
+# 	$(shell (cat ./lhs2tex.header && cat $< && echo $$'\\end{document}') | lhs2TeX --poly > $@)
+# 这行命令是说，对于每个 .lhs 文件，先输出 lhs2tex.header 的内容，然后是 .lhs 文件本身的内容，最后是 \\end{document}，然后通过 lhs2TeX --poly 命令转换成 .tex 文件。
+
+# 按照 Makefile 的规则，这个文件会被转换成 .tex 文件，然后通过 LaTeX 编译成 PDF。在这个过程中，lhs2tex.header 中的格式化规则会被应用，确保 Haskell 代码在文档中正确显示。
+# 我再想想，这个 lhs2tex.header 文件和 Makefile 的配合，确实可以让开发者更方便地生成高质量的文档。开发者只需要写好 .lhs 文件，然后运行 make 命令，就可以自动生成 PDF 文档，而不用手动处理格式化的问题。
+# 我得总结一下这个过程。lhs2tex.header 文件定义了格式化规则，Makefile 自动化了转换和编译的过程。这样，开发者就可以专注于内容，而不用关心格式化和编译的细节。这个过程确实很高效，也很方便。
+
+
+# 具体执行过程
+# 生成 .tex 文件：
+# cat ./lhs2tex.header：输出 lhs2tex.header 文件的内容。
+# cat $<：输出 $(SRC)/%.lhs 文件的内容。
+# echo $$'\\end{document}'：输出 \\end{document}。
+# lhs2TeX --poly：将这些内容转换为 LaTeX 文件。
+# 生成 .pdf 文件：
+# $(TEXTEMPDIR)/%.pdf: $(TEXTEMPDIR)/%.tex：
+# sed -i "s/\\documentclass{article}/\\documentclass{ctexart}/" $<：
+# 将 \\documentclass{article} 替换为 \\documentclass{ctexart}。
+# $(TEX) $<：
+# 使用 xelatex 命令编译 TeX 文件。
+# 复制 .pdf 文件：
+# $(DOCS)/%.pdf: $(TEXTEMPDIR)/%.pdf：
+# cp $< $@：将 .pdf 文件复制到 $(DOCS) 目录。
+# cp $(subst .pdf,.synctex.gz,$<) $(subst .pdf,.synctex.gz, $@)：将 .synctex.gz 文件复制到 $(DOCS) 目录。
+# 总结
+# lhs2tex.header 文件定义了 LaTeX 文档的头部信息和格式化规则，用于将 Literate Haskell 文件转换为 LaTeX 文档。在 Makefile 中，这个文件被用于生成 .tex 文件，然后通过 LaTeX 编译生成 .pdf 文件。通过这种方式，Makefile 自动化地完成了从 Literate Haskell 文件到 PDF 文档的转换过程。
