@@ -8,6 +8,14 @@ module Parsers (article, parse, section) where
 
 import Ast
 import Text.Parsec hiding (parse)
+-- module Parsers (article, parse, section) where:
+-- 定义了一个名为 Parsers 的模块。
+-- 模块导出了 article、parse 和 section 三个函数。
+-- import Ast:
+-- 导入 Ast 模块，假设它定义了 Markdown 的抽象语法树（AST）数据结构。
+-- import Text.Parsec hiding (parse):
+-- 导入 Text.Parsec 模块，用于文本解析。
+-- hiding (parse) 表示隐藏 Text.Parsec 模块中的 parse 函数，避免与本地定义的 parse 函数冲突。
 
 type Analyser = Parsec 
   String   -- 输入给 parser 的内容
@@ -16,6 +24,19 @@ type Analyser = Parsec
 warn :: Analyser a -> String -> Analyser a
 warn p s = modifyState (s:) *> p
 
+-- type Analyser = Parsec String [String]:
+-- 定义了一个类型别名 Analyser，表示一个 Parsec 解析器。
+-- Parsec 是 Text.Parsec 模块中的解析器类型。
+-- String 是解析器的输入类型。
+-- [String] 是解析器的状态类型，用于存放警告信息。
+-- warn :: Analyser a -> String -> Analyser a:
+-- 定义了一个 warn 函数，用于在解析器的状态中添加警告信息。
+-- p 是一个解析器。
+-- s 是要添加的警告信息。
+-- modifyState (s:) *> p:
+-- modifyState (s:) 将警告信息 s 添加到状态中。
+-- *> 是 Monad 操作符，用于忽略 modifyState 的返回值，继续执行 p。
+
 parse :: Analyser a -> String -> String -> Either ParseError (a, [String])
 parse p name input = runParser p' [] name input
   where
@@ -23,6 +44,22 @@ parse p name input = runParser p' [] name input
       l <- p
       r <- getState
       return (l, r)
+
+      -- parse :: Analyser a -> String -> String -> Either ParseError (a, [String]):
+      -- 定义了一个 parse 函数，用于运行解析器并返回解析结果。
+      -- p 是解析器。
+      -- name 是输入文件的名称。
+      -- input 是输入的字符串。
+      -- 返回值是一个 Either 类型，表示解析结果：
+      -- Left ParseError 表示解析失败，返回解析错误。
+      -- Right (a, [String]) 表示解析成功，返回解析结果 a 和警告信息列表 [String]。
+      -- runParser p' [] name input:
+      -- runParser 是 Text.Parsec 模块中的函数，用于运行解析器。
+      -- p' 是一个修改后的解析器，用于捕获解析结果和状态。
+      -- p' = do:
+      -- l <- p 运行解析器 p，并将结果绑定到 l。
+      -- r <- getState 获取解析器的状态（警告信息列表），并绑定到 r。
+      -- return (l, r) 返回解析结果和状态。
 
 \end{code}
 
@@ -68,6 +105,17 @@ anyCharUnit = do
         -- 因为如何处理转义符后开启新行时的缩进有待讨论。
         _ -> return (n, True)
     _ -> return (c, False)
+
+    -- type CharUnit = (Char, Bool):
+    -- 定义了一个类型别名 CharUnit，表示一个字符及其是否被转义。
+    -- anyCharUnit :: Analyser CharUnit:
+    -- 定义了一个解析器 anyCharUnit，用于解析一个字符元。
+    -- anyChar 是 Text.Parsec 模块中的函数，用于解析一个字符。
+    -- case c of 根据字符 c 的值进行模式匹配：
+    -- '\r'：处理回车符，尝试解析换行符 \n。
+    -- '\n'：处理换行符，直接返回。
+    -- '\\'：处理转义符，解析下一个字符并标记为转义。
+    -- 其他字符：直接返回，标记为未转义。
 
 withslash :: CharUnit -> String
 withslash (c, True) = ['\\', c]
@@ -172,6 +220,21 @@ inlinemd m = do
 
 \end{code}
 
+-- inlinemd :: Maybe CharUnit -> Analyser Ast:
+-- 定义了一个解析器 inlinemd，用于解析普通文本内容。
+-- m 是一个 Maybe CharUnit 类型的参数，表示当前解析的上下文。
+-- let symbols' = case m of:
+-- 根据 m 的值，定义 symbols'，表示需要处理的特殊符号列表。
+-- content <- Plain . map fst <$> many (try (noneUnitOf symbols')):
+-- many 是 Text.Parsec 模块中的函数，用于解析多个字符元。
+-- noneUnitOf symbols' 是一个解析器，用于解析不在 symbols' 列表中的字符元。
+-- map fst 提取字符元的字符部分。
+-- Plain 是 Ast 模块中的数据类型，表示纯文本内容。
+-- symbol <- lookAhead anyCharUnit:
+-- lookAhead 是 Text.Parsec 模块中的函数，用于查看下一个字符元而不消耗它。
+-- if Just symbol == m:
+-- 如果当前字符元与 m 匹配，表示解析结束，返回一个段落节点。
+-- 否则，根据字符元的值进行不同的处理，例如解析数学公式、链接等。
 
 \section{数学公式}
 
@@ -212,7 +275,19 @@ displayMath = do
       ]
   return . Math formula $ True
 
-
+  -- inlineMath :: Analyser Ast:
+  -- 定义了一个解析器 inlineMath，用于解析行内数学公式。
+  -- charUnit ('$', False):
+  -- 解析一个 $ 符号，表示数学公式的开始。
+  -- pos <- getPosition:
+  -- 获取当前解析位置。
+  -- formula <- concat . map withslash <$> many (try $ noneUnitOf [('$', False), ('\n', False)]):
+  -- 解析数学公式的内容，直到遇到 $ 或换行符。
+  -- (try $ charUnit ('$', False)) <|> ...:
+  -- 尝试解析一个 $ 符号，表示数学公式的结束。
+  -- 如果解析失败，添加警告信息。
+  -- return . Math formula $ False:
+  -- 返回一个 Math 节点，表示数学公式。
 \end{code}
 
 \section{链接和图片}
@@ -250,7 +325,14 @@ figure = do
 用 \_ 包裹内容以对其打下划线，
 用 *  包裹内容以使其斜体，
 用 \^ 包裹内容以使其加粗。
-
+-- link :: Analyser Ast:
+-- 定义了一个解析器 link，用于解析链接。
+-- text <- charUnit ('[', False) *> inlinemd (Just (']', False)):
+-- 解析链接的文本部分。
+-- link <- charUnit ('(', False) *> ... <* charUnit (')', False):
+-- 解析链接的路径部分。
+-- return . Link text $ map fst $ link:
+-- 返回一个 Link 节点，表示链接。
 \begin{code}
 
 emphasis :: CharUnit -> Analyser Ast
@@ -265,7 +347,12 @@ emphasis symbol = do
     _ -> error "unrecognized beginner of emphasis"
 
 \end{code}
-
+-- emphasis :: CharUnit -> Analyser Ast:
+-- 定义了一个解析器 emphasis，用于解析强调内容。
+-- emphasised <- charUnit symbol *> inlinemd (Just symbol):
+-- 解析强调的内容。
+-- return . Emphasis emphasised $ case fst symbol of:
+-- 根据强调符号的值，返回一个 Emphasis 节点，表示强调内容。
 \section{列表}
 
 在 igem-markdown 中，我们提供列表功能，
@@ -308,7 +395,10 @@ itemization' n = Itemization <$> many1 group
             (n + 1) `indented` indirect
             <|> itemization' (n + 1)
       return $ first : followers
-
+      -- itemization :: Analyser Ast:
+      -- 定义了一个解析器 itemization，用于解析无序列表。
+      -- itemization = itemization' 0:
+      -- 调用 itemization' 函数，从第 0 层开始解析。
 enumeration' :: Int -> Analyser Ast
 enumeration' n = Enumeration <$> many1 group
   where
@@ -394,7 +484,14 @@ section = do
             figure,
             inlinemd Nothing
           ]
-
+          -- section :: Analyser Ast:
+          -- 定义了一个解析器 section，用于解析章节。
+          -- (title, date) <- sectionTitle:
+          -- 解析章节标题和日期。
+          -- c <- many paragraph:
+          -- 解析章节内容。
+          -- return $ Section title date c:
+          -- 返回一个 Section 节点，表示章节。
 article :: Analyser [Ast]
 article =
   many $
