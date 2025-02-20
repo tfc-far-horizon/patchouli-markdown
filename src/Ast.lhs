@@ -106,7 +106,7 @@ instance ToJSON Ast where--为 Ast 提供了 ToJSON 实例，定义了如何将 
         "date" .= date,
         "content" .= content
       ]
-      Section：
+      -- Section：
 -- 类型为 "section"。
 -- 包含标题、日期（可选）和内容。
   toJSON (Figure path caption) =
