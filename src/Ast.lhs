@@ -1,11 +1,11 @@
 Ast: Abstract Syntax Tree 是一种抽象的、表示文档内容的数据结构，
 在这个文件中我们定义 igem-markdown 所使用的 Ast 的数据结构和 JSON 表示。
 
-{-|
-  Abstract Syntax Tree (AST) 是一种抽象的、表示文档内容的数据结构。
-  在本模块中，我们定义了 igem-markdown 所使用的 AST 的数据结构（Haskell 代数数据类型）和 JSON 表示。
-  使用 Aeson 库进行 JSON 转换，并通过 Data.Text 的 Text 类型完成 JSON 转换。
--}
+
+Abstract Syntax Tree (AST) 是一种抽象的、表示文档内容的数据结构。
+在本模块中，我们定义了 igem-markdown 所使用的 AST 的数据结构（Haskell 代数数据类型）和 JSON 表示。
+使用 Aeson 库进行 JSON 转换，并通过 Data.Text 的 Text 类型完成 JSON 转换。
+
 
 \begin{code}
 module Ast
