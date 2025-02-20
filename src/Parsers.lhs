@@ -139,19 +139,14 @@ inlinemd m = do
             -- 因此在目标不是链接时会回退整个中括号块，
             -- 但这个性能损失我觉得还能接受
             char '['
-            *> inlinemd (Just (']', False))
-        (Paragraph (inline : inlines)) <- inlinemd m
+            *> inlinemd m
         case prependee of
-          (Link _ _) ->
+          (Link _ _) -> do
+            (Paragraph (inline : inlines)) <- inlinemd m
             return . Paragraph $
               content : prependee : inline : inlines
-          (Paragraph [(Plain t)]) -> case inline of
-            (Plain t') ->
-              return . Paragraph $
-                (Plain (plaintext content ++ t ++ t')) : inlines
-            _ ->
-              return . Paragraph $
-                (Plain (plaintext content ++ t)) : inline : inlines
+          Paragraph [(Plain t)] ->
+            return . Paragraph . (:[]) . Plain $ plaintext content ++ ('[':t)
           _ -> error $ show prependee
       ('\n', False) -> case m of
         Just u -> unexpected $ "end of line\n, expecting" ++ withslash u
