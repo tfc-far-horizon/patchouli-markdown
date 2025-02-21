@@ -15,7 +15,8 @@ import Text.Parsec hiding (parse)
 -- 导入 Ast 模块，假设它定义了 Markdown 的抽象语法树（AST）数据结构。
 -- import Text.Parsec hiding (parse):
 -- 导入 Text.Parsec 模块，用于文本解析。
--- hiding (parse) 表示隐藏 Text.Parsec 模块中的 parse 函数，避免与本地定义的 parse 函数冲突。
+-- hiding (parse) 表示隐藏 Text.Parsec 模块中的 parse 函数，
+-- 避免与本地定义的 parse 函数冲突。
 
 type Analyser = Parsec 
   String   -- 输入给 parser 的内容
@@ -35,7 +36,7 @@ warn p s = modifyState (s:) *> p
 -- s 是要添加的警告信息。
 -- modifyState (s:) *> p:
 -- modifyState (s:) 将警告信息 s 添加到状态中。
--- *> 是 Monad 操作符，用于忽略 modifyState 的返回值，继续执行 p。
+-- *> 是 Applicative 操作符，用于忽略 modifyState 的返回值，继续执行 p。
 
 parse :: Analyser a -> String -> String -> Either ParseError (a, [String])
 parse p name input = runParser p' [] name input
@@ -221,19 +222,26 @@ inlinemd m = do
 \end{code}
 
 inlinemd :: Maybe CharUnit -> Analyser Ast:
-定义了一个解析器 inlinemd，用于解析普通文本内容。
+定义了一个解析器 inlinemd，用于解析普通文本内容；
 m 是一个 Maybe CharUnit 类型的参数，表示当前解析的上下文。
+
 let symbols' = case m of:
 根据 m 的值，定义 symbols'，表示需要处理的特殊符号列表。
+
 content <- Plain . map fst <\$> many (try (noneUnitOf symbols')):
 many 是 Text.Parsec 模块中的函数，用于解析多个字符元。
+
 noneUnitOf symbols' 是一个解析器，用于解析不在 symbols' 列表中的字符元。
+
 map fst 提取字符元的字符部分。
+
 Plain 是 Ast 模块中的数据类型，表示纯文本内容。
+
 symbol <- lookAhead anyCharUnit:
 lookAhead 是 Text.Parsec 模块中的函数，用于查看下一个字符元而不消耗它。
+
 if Just symbol == m:
-如果当前字符元与 m 匹配，表示解析结束，返回一个段落节点。
+如果当前字符元与 m 匹配，表示解析结束，返回一个段落节点；
 否则，根据字符元的值进行不同的处理，例如解析数学公式、链接等。
 
 \section{数学公式}
@@ -316,14 +324,19 @@ figure = do
 用 \_ 包裹内容以对其打下划线，
 用 *  包裹内容以使其斜体，
 用 \^ 包裹内容以使其加粗。
+
 link :: Analyser Ast:
 定义了一个解析器 link，用于解析链接。
+
 text <- charUnit (`[', False) *> inlinemd (Just (`]', False)):
 解析链接的文本部分。
+
 link <- charUnit (`(', False) *> ... <* charUnit (`)', False):
 解析链接的路径部分。
+
 return . Link text \$ map fst \$ link:
 返回一个 Link 节点，表示链接。
+
 \begin{code}
 
 emphasis :: CharUnit -> Analyser Ast
@@ -338,12 +351,16 @@ emphasis symbol = do
     _ -> error "unrecognized beginner of emphasis"
 
 \end{code}
+
 emphasis :: CharUnit -> Analyser Ast:
 定义了一个解析器 emphasis，用于解析强调内容。
+
 emphasised <- charUnit symbol *> inlinemd (Just symbol):
 解析强调的内容。
+
 return . Emphasis emphasised \$ case fst symbol of:
 根据强调符号的值，返回一个 Emphasis 节点，表示强调内容。
+
 \section{列表}
 
 在 igem-markdown 中，我们提供列表功能，

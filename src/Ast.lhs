@@ -1,6 +1,3 @@
-Ast: Abstract Syntax Tree 是一种抽象的、表示文档内容的数据结构，
-在这个文件中我们定义 igem-markdown 所使用的 Ast 的数据结构和 JSON 表示。
-
 
 Abstract Syntax Tree (AST) 是一种抽象的、表示文档内容的数据结构。
 在本模块中，我们定义了 igem-markdown 所使用的 AST 的数据结构（Haskell 代数数据类型）和 JSON 表示。
@@ -73,6 +70,7 @@ data EmphasisType
   -- UnderLined：下划线。
   -- Italic：斜体。
   -- Bold：加粗。
+
 instance ToJSON EmphasisType where
   toJSON UnderLined = String "underlined"
   toJSON Italic = String "italic"
@@ -81,14 +79,20 @@ instance ToJSON EmphasisType where
 
 (.::) :: Key -> Text -> (Key, Value)
 l .:: r = l .= String r
--- 定义了一个辅助函数 (.::)，用于简化 JSON 键值对的构造。它将一个键和一个 Text 类型的值组合成一个键值对。
 \end{code}
+定义了一个辅助函数 (.::)，用于简化 JSON 键值对的构造。它将一个键和一个 Text 类型的值组合成一个键值对。
+
+在 (.=) 的左右侧都是字符串字面量时，由于单一同态限定，
+右侧字符串字面量会被推导为 Text，而不是 (.=) 需要的 Value。
+
+因此，使用辅助函数 (.::) 来规避这一限定。
 
 以下定义了如何将 Ast 转为 JSON
 
 \begin{code}
 
-instance ToJSON Ast where--为 Ast 提供了 ToJSON 实例，定义了如何将 Ast 转换为 JSON 格式。
+instance ToJSON Ast where
+--为 Ast 提供了 ToJSON 实例，定义了如何将 Ast 转换为 JSON 格式。
   toJSON (Paragraph asts) =
     object
       [ "type" .:: "paragraph",

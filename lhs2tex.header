@@ -10,4 +10,7 @@
 %format  $>  = "{\small\$}\hspace{-0.5em}>"
 %format <$>  = "<\hspace{-0.5em}{\small\$}\hspace{-0.5em}>"
 
+\newcommand\tick{\text{\texttt{`}}}
+%format `prepend` = "\ \tick prepend \tick\ "
+
 \begin{document}
