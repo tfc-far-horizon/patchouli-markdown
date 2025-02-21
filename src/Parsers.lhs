@@ -112,9 +112,9 @@ anyCharUnit = do
     -- 定义了一个解析器 anyCharUnit，用于解析一个字符元。
     -- anyChar 是 Text.Parsec 模块中的函数，用于解析一个字符。
     -- case c of 根据字符 c 的值进行模式匹配：
-    -- '\r'：处理回车符，尝试解析换行符 \n。
-    -- '\n'：处理换行符，直接返回。
-    -- '\\'：处理转义符，解析下一个字符并标记为转义。
+    -- `\textbackslash r'：处理回车符，尝试解析换行符 \textbackslash n。
+    -- `\textbackslash n'：处理换行符，直接返回。
+    -- `\textbackslash \textbackslash'：处理转义符，解析下一个字符并标记为转义。
     -- 其他字符：直接返回，标记为未转义。
 
 withslash :: CharUnit -> String
@@ -220,21 +220,21 @@ inlinemd m = do
 
 \end{code}
 
--- inlinemd :: Maybe CharUnit -> Analyser Ast:
--- 定义了一个解析器 inlinemd，用于解析普通文本内容。
--- m 是一个 Maybe CharUnit 类型的参数，表示当前解析的上下文。
--- let symbols' = case m of:
--- 根据 m 的值，定义 symbols'，表示需要处理的特殊符号列表。
--- content <- Plain . map fst <$> many (try (noneUnitOf symbols')):
--- many 是 Text.Parsec 模块中的函数，用于解析多个字符元。
--- noneUnitOf symbols' 是一个解析器，用于解析不在 symbols' 列表中的字符元。
--- map fst 提取字符元的字符部分。
--- Plain 是 Ast 模块中的数据类型，表示纯文本内容。
--- symbol <- lookAhead anyCharUnit:
--- lookAhead 是 Text.Parsec 模块中的函数，用于查看下一个字符元而不消耗它。
--- if Just symbol == m:
--- 如果当前字符元与 m 匹配，表示解析结束，返回一个段落节点。
--- 否则，根据字符元的值进行不同的处理，例如解析数学公式、链接等。
+inlinemd :: Maybe CharUnit -> Analyser Ast:
+定义了一个解析器 inlinemd，用于解析普通文本内容。
+m 是一个 Maybe CharUnit 类型的参数，表示当前解析的上下文。
+let symbols' = case m of:
+根据 m 的值，定义 symbols'，表示需要处理的特殊符号列表。
+content <- Plain . map fst <\$> many (try (noneUnitOf symbols')):
+many 是 Text.Parsec 模块中的函数，用于解析多个字符元。
+noneUnitOf symbols' 是一个解析器，用于解析不在 symbols' 列表中的字符元。
+map fst 提取字符元的字符部分。
+Plain 是 Ast 模块中的数据类型，表示纯文本内容。
+symbol <- lookAhead anyCharUnit:
+lookAhead 是 Text.Parsec 模块中的函数，用于查看下一个字符元而不消耗它。
+if Just symbol == m:
+如果当前字符元与 m 匹配，表示解析结束，返回一个段落节点。
+否则，根据字符元的值进行不同的处理，例如解析数学公式、链接等。
 
 \section{数学公式}
 
@@ -244,22 +244,26 @@ inlinemd m = do
 包裹的一段 LaTeX 数学公式。
 
 inline mode （行内公式）可以出现在普通文本内容之内，
-display mode （行间公式）可以单独成行。
+display mode （行间公式）必须单独成行。
 
 \begin{code}
 
 inlineMath :: Analyser Ast
+  -- 定义了一个解析器 inlineMath，用于解析行内数学公式。
 inlineMath = do
-  charUnit ('$', False)
-  pos <- getPosition
+  charUnit ('$', False) -- 解析一个 \$ 符号，表示数学公式的开始。
+  pos <- getPosition    -- 获取当前解析位置。
   formula <-
     concat . map withslash
       <$> many (try $ noneUnitOf [('$', False), ('\n', False)])
-  (try $ charUnit ('$', False)) <|> return ('$', False) `warn` unlines 
-    [ "unenclosed inline math environment",
-      "note: math env began at" ++ show pos
-    ]
+  -- 解析数学公式的内容，直到遇到 \$ 或换行符。
+  (try $ charUnit ('$', False)) -- 尝试解析一个 \$ 符号，表示数学公式的结束。
+    <|> return ('$', False) `warn` unlines 
+      [ "unenclosed inline math environment",
+        "note: math env began at" ++ show pos
+      ] -- 如果解析失败，添加警告信息。
   return . Math formula $ False
+  -- 返回一个 Math 节点，表示数学公式。
 
 displayMath :: Analyser Ast
 displayMath = do
@@ -275,19 +279,6 @@ displayMath = do
       ]
   return . Math formula $ True
 
-  -- inlineMath :: Analyser Ast:
-  -- 定义了一个解析器 inlineMath，用于解析行内数学公式。
-  -- charUnit ('$', False):
-  -- 解析一个 $ 符号，表示数学公式的开始。
-  -- pos <- getPosition:
-  -- 获取当前解析位置。
-  -- formula <- concat . map withslash <$> many (try $ noneUnitOf [('$', False), ('\n', False)]):
-  -- 解析数学公式的内容，直到遇到 $ 或换行符。
-  -- (try $ charUnit ('$', False)) <|> ...:
-  -- 尝试解析一个 $ 符号，表示数学公式的结束。
-  -- 如果解析失败，添加警告信息。
-  -- return . Math formula $ False:
-  -- 返回一个 Math 节点，表示数学公式。
 \end{code}
 
 \section{链接和图片}
@@ -325,14 +316,14 @@ figure = do
 用 \_ 包裹内容以对其打下划线，
 用 *  包裹内容以使其斜体，
 用 \^ 包裹内容以使其加粗。
--- link :: Analyser Ast:
--- 定义了一个解析器 link，用于解析链接。
--- text <- charUnit ('[', False) *> inlinemd (Just (']', False)):
--- 解析链接的文本部分。
--- link <- charUnit ('(', False) *> ... <* charUnit (')', False):
--- 解析链接的路径部分。
--- return . Link text $ map fst $ link:
--- 返回一个 Link 节点，表示链接。
+link :: Analyser Ast:
+定义了一个解析器 link，用于解析链接。
+text <- charUnit (`[', False) *> inlinemd (Just (`]', False)):
+解析链接的文本部分。
+link <- charUnit (`(', False) *> ... <* charUnit (`)', False):
+解析链接的路径部分。
+return . Link text \$ map fst \$ link:
+返回一个 Link 节点，表示链接。
 \begin{code}
 
 emphasis :: CharUnit -> Analyser Ast
@@ -347,12 +338,12 @@ emphasis symbol = do
     _ -> error "unrecognized beginner of emphasis"
 
 \end{code}
--- emphasis :: CharUnit -> Analyser Ast:
--- 定义了一个解析器 emphasis，用于解析强调内容。
--- emphasised <- charUnit symbol *> inlinemd (Just symbol):
--- 解析强调的内容。
--- return . Emphasis emphasised $ case fst symbol of:
--- 根据强调符号的值，返回一个 Emphasis 节点，表示强调内容。
+emphasis :: CharUnit -> Analyser Ast:
+定义了一个解析器 emphasis，用于解析强调内容。
+emphasised <- charUnit symbol *> inlinemd (Just symbol):
+解析强调的内容。
+return . Emphasis emphasised \$ case fst symbol of:
+根据强调符号的值，返回一个 Emphasis 节点，表示强调内容。
 \section{列表}
 
 在 igem-markdown 中，我们提供列表功能，
@@ -490,7 +481,7 @@ section = do
           -- 解析章节标题和日期。
           -- c <- many paragraph:
           -- 解析章节内容。
-          -- return $ Section title date c:
+          -- return \$ Section title date c:
           -- 返回一个 Section 节点，表示章节。
 article :: Analyser [Ast]
 article =
