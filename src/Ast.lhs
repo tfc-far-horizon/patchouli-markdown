@@ -56,8 +56,8 @@ data Ast = Paragraph {content :: [Ast]}
   -- Section：章节，包含标题、日期（可选）和内容。
   -- Figure：图片，包含路径和标题。
   -- Link：链接，包含文本和路径。
-  -- Itemization：无序列表，包含一个二维 Ast 列表。
-  -- Enumeration：有序列表，包含一个二维 Ast 列表。
+  -- Itemization：无序列表，包含一个 Ast 列表。
+  -- Enumeration：有序列表，包含一个 Ast 列表。
   -- Plain：纯文本。
   -- Math：数学公式，包含公式内容和显示模式（display 表示是否为显示模式）。
   -- Emphasis：强调文本，包含内容和强调类型。
@@ -122,14 +122,24 @@ instance ToJSON Ast where
   toJSON (Itemization p's) =
     object
       [ "type" .:: "itemization",
-        "items" .= p's
+        "items" .= map (\(head':tail') ->
+          object [
+            "title" .= head',
+            "content" .= tail'
+          ]
+        ) p's
         -- the first paragraph for each list
         -- in list p's will be marked with dot
       ]
   toJSON (Enumeration p's) =
     object
       [ "type" .:: "enumeration",
-        "items" .= p's
+        "items" .= map (\(head':tail') ->
+          object [
+            "title" .= head',
+            "content" .= tail'
+          ]
+        ) p's
         -- the first paragraph for each list
         -- in list p's will be marked with number
       ]

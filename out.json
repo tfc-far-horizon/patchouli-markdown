@@ -1,0 +1,61 @@
+[
+    [
+        {
+            "type": "itemization",
+            "items": [
+                {
+                    "content": [
+                        {
+                            "content": [
+                                {
+                                    "content": "and indented plain text",
+                                    "type": "plain"
+                                }
+                            ],
+                            "type": "paragraph"
+                        },
+                        {
+                            "type": "itemization",
+                            "items": [
+                                {
+                                    "content": [],
+                                    "title": {
+                                        "content": [
+                                            {
+                                                "content": "and sub element",
+                                                "type": "plain"
+                                            }
+                                        ],
+                                        "type": "paragraph"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "title": {
+                        "content": [
+                            {
+                                "content": "test",
+                                "type": "plain"
+                            }
+                        ],
+                        "type": "paragraph"
+                    }
+                },
+                {
+                    "content": [],
+                    "title": {
+                        "content": [
+                            {
+                                "content": "second element",
+                                "type": "plain"
+                            }
+                        ],
+                        "type": "paragraph"
+                    }
+                }
+            ]
+        }
+    ],
+    []
+]

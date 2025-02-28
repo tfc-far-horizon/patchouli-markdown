@@ -382,43 +382,49 @@ return . Emphasis emphasised \$ case fst symbol of:
 indented :: Int -> Analyser Ast -> Analyser Ast
 indented n p = count n (char '\t') *> p
 
-directItem :: Analyser Ast
-directItem = oneOf "+-" *> char ' ' *> inlinemd Nothing
+simpleLine :: Analyser Ast
+simpleLine = choice . map try $ [
+  figure,
+  displayMath,
+  inlinemd Nothing
+  ]
 
-directEnum :: Analyser Ast
-directEnum = many digit *> char '.' *> char ' ' *> inlinemd Nothing
-
-indirect :: Analyser Ast
-indirect = displayMath <|> figure <|> inlinemd Nothing
+itemLine :: Int -> Analyser Ast
+itemLine n = choice . map try $ [
+  itemization' n,
+  enumeration' n,
+  n `indented` simpleLine
+  ]
 
 itemization' :: Int -> Analyser Ast
 itemization' n = Itemization <$> many1 group
   where
     group :: Analyser [Ast]
-    group = try $ do
-      first <- n `indented` directItem
-      followers <-
-        many . try $
-          do
-            (n + 1) `indented` indirect
-            <|> itemization' (n + 1)
-      return $ first : followers
-      -- itemization :: Analyser Ast:
-      -- 定义了一个解析器 itemization，用于解析无序列表。
-      -- itemization = itemization' 0:
-      -- 调用 itemization' 函数，从第 0 层开始解析。
+    group = do
+      head' <- n `indented` item'
+      tail' <- many $ itemLine (n+1)
+      return $ head':tail'
+
 enumeration' :: Int -> Analyser Ast
 enumeration' n = Enumeration <$> many1 group
   where
     group :: Analyser [Ast]
-    group = try $ do
-      first <- n `indented` directEnum
-      followers <-
-        many . try $
-          do
-            (n + 1) `indented` indirect
-            <|> enumeration' (n + 1)
-      return $ first : followers
+    group = do
+      head' <- n `indented` enum'
+      tail' <- many $ itemLine (n+1)
+      return $ head':tail'
+
+item' :: Analyser Ast
+item' = do
+  oneOf "+-"
+  string " "
+  inlinemd Nothing
+
+enum' :: Analyser Ast
+enum' = do
+  many1 digit
+  string ". "
+  inlinemd Nothing
 
 itemization :: Analyser Ast
 itemization = itemization' 0
@@ -486,7 +492,8 @@ section = do
   where
     paragraph =
       try $
-        choice
+        choice $
+          map try $
           [ itemization,
             enumeration,
             figure,
