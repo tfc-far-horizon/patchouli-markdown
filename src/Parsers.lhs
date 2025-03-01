@@ -391,7 +391,7 @@ simpleLine = choice . map try $ [
 
 infix 3 `try_else`
 try_else :: ParsecT s u m a -> ParsecT s u m a -> ParsecT s u m a
-try_else u v = try u <|> v
+try_else u v = try u <|> try v
 
 itemGroup :: Int -> Analyser ItemGroup
 itemGroup n =

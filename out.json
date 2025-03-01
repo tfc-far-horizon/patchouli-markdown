@@ -9,16 +9,17 @@
                             "type": "itemization",
                             "items": [
                                 {
-                                    "content": {
+                                    "content": [],
+                                    "type": "normal-item",
+                                    "title": {
                                         "content": [
                                             {
-                                                "content": "+ and first sub element",
+                                                "content": "first element",
                                                 "type": "plain"
                                             }
                                         ],
                                         "type": "paragraph"
-                                    },
-                                    "type": "plain-item"
+                                    }
                                 },
                                 {
                                     "content": {

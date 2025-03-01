@@ -1,5 +1,5 @@
 + test
-	+ and first sub element
+	+ first element
 	Plain text
 	+ another element
 Outer
