@@ -10,6 +10,7 @@ module Ast
     EmphasisType (..),
     Day,
     fromGregorian,
+    ItemGroup(..)
   )
 where
 
@@ -28,7 +29,8 @@ import Data.Time.Calendar (Day, fromGregorian)
 -- Data.Text：提供了 Text 类型，用于处理文本数据。
 -- Data.Time.Calendar：提供了日期相关的类型和函数，例如 Day 和 fromGregorian。
 
-data Ast = Paragraph {content :: [Ast]}
+data Ast
+  = Paragraph {content :: [Ast]}
   | Section
       { title :: String,
         date :: Maybe Day,
@@ -42,8 +44,7 @@ data Ast = Paragraph {content :: [Ast]}
       { text :: Ast,
         path :: String
       }
-  | Itemization [[Ast]]
-  | Enumeration [[Ast]]
+  | Itemization [ItemGroup]
   | Plain {plaintext :: String}
   | Math
       { formula :: String,
@@ -61,6 +62,28 @@ data Ast = Paragraph {content :: [Ast]}
   -- Plain：纯文本。
   -- Math：数学公式，包含公式内容和显示模式（display 表示是否为显示模式）。
   -- Emphasis：强调文本，包含内容和强调类型。
+
+data ItemGroup
+  = Normal'Item
+      { itemTitle :: Ast,
+        itemContent :: [Ast]
+      }
+  | Plain'Item Ast
+  deriving (Show)
+
+instance ToJSON ItemGroup where
+  toJSON (Normal'Item title content) =
+    object
+      [ "type" .:: "normal-item",
+        "title" .= title,
+        "content" .= content
+      ]
+  toJSON (Plain'Item ast) =
+    object
+      [ "type" .:: "plain-item",
+        "content" .= ast
+      ]
+
 data EmphasisType
   = UnderLined
   | Italic
@@ -92,17 +115,20 @@ l .:: r = l .= String r
 \begin{code}
 
 instance ToJSON Ast where
---为 Ast 提供了 ToJSON 实例，定义了如何将 Ast 转换为 JSON 格式。
+  -- 为 Ast 提供了 ToJSON 实例，定义了如何将 Ast 转换为 JSON 格式。
   toJSON (Paragraph asts) =
     object
       [ "type" .:: "paragraph",
-        "content" .= filter (\ast -> case ast of
-          Plain "" -> False
-          _ -> True
-        ) asts
+        "content"
+          .= filter
+            ( \ast -> case ast of
+                Plain "" -> False
+                _ -> True
+            )
+            asts
       ]
---       类型为 "paragraph"。
--- 内容为 asts，但会过滤掉空的 Plain 节点。
+  --       类型为 "paragraph"。
+  -- 内容为 asts，但会过滤掉空的 Plain 节点。
   toJSON (Section title date content) =
     object
       [ "type" .:: "section",
@@ -110,9 +136,9 @@ instance ToJSON Ast where
         "date" .= date,
         "content" .= content
       ]
-      -- Section：
--- 类型为 "section"。
--- 包含标题、日期（可选）和内容。
+  -- Section：
+  -- 类型为 "section"。
+  -- 包含标题、日期（可选）和内容。
   toJSON (Figure path caption) =
     object
       [ "type" .:: "figure",
@@ -122,26 +148,9 @@ instance ToJSON Ast where
   toJSON (Itemization p's) =
     object
       [ "type" .:: "itemization",
-        "items" .= map (\(head':tail') ->
-          object [
-            "title" .= head',
-            "content" .= tail'
-          ]
-        ) p's
+        "items" .= p's
         -- the first paragraph for each list
         -- in list p's will be marked with dot
-      ]
-  toJSON (Enumeration p's) =
-    object
-      [ "type" .:: "enumeration",
-        "items" .= map (\(head':tail') ->
-          object [
-            "title" .= head',
-            "content" .= tail'
-          ]
-        ) p's
-        -- the first paragraph for each list
-        -- in list p's will be marked with number
       ]
   toJSON (Math f d) =
     object
@@ -174,5 +183,6 @@ instance ToJSON Ast where
 instance Show Ast where
   show ast = show $ encode ast
   -- 为 Ast 提供了 Show 实例，通过将 Ast 编码为 JSON 字符串来显示。
+
 
 \end{code}

@@ -4,7 +4,7 @@ Parsers 模块定义了各个层级的 Parser，
 所有 Parser 有共同的签名： Analyser Ast
 
 \begin{code}
-module Parsers (article, parse, section) where
+module Parsers (article, parse, itemization) where
 
 import Ast
 import Text.Parsec hiding (parse)
@@ -379,8 +379,8 @@ return . Emphasis emphasised \$ case fst symbol of:
 
 \begin{code}
 
-indented :: Int -> Analyser Ast -> Analyser Ast
-indented n p = count n (char '\t') *> p
+indented :: Int -> Analyser p -> Analyser p
+indented n = (count n (char '\t') *>)
 
 simpleLine :: Analyser Ast
 simpleLine = choice . map try $ [
@@ -389,48 +389,31 @@ simpleLine = choice . map try $ [
   inlinemd Nothing
   ]
 
-itemLine :: Int -> Analyser Ast
-itemLine n = choice . map try $ [
-  itemization' n,
-  enumeration' n,
-  n `indented` simpleLine
-  ]
+infix 3 `try_else`
+try_else :: ParsecT s u m a -> ParsecT s u m a -> ParsecT s u m a
+try_else u v = try u <|> v
+
+itemGroup :: Int -> Analyser ItemGroup
+itemGroup n =
+  exactGroup n `try_else` Plain'Item <$> n `indented` simpleLine
+
+exactGroup :: Int -> Analyser ItemGroup
+exactGroup n = do
+    title' <- n `indented` item'title
+    content' <- many $ itemization' $ n + 1
+    return $ Normal'Item title' content'
+  where
+    item'title :: Analyser Ast
+    item'title = do
+      oneOf "+-"
+      char ' '
+      inlinemd Nothing
 
 itemization' :: Int -> Analyser Ast
-itemization' n = Itemization <$> many1 group
-  where
-    group :: Analyser [Ast]
-    group = do
-      head' <- n `indented` item'
-      tail' <- many $ itemLine (n+1)
-      return $ head':tail'
-
-enumeration' :: Int -> Analyser Ast
-enumeration' n = Enumeration <$> many1 group
-  where
-    group :: Analyser [Ast]
-    group = do
-      head' <- n `indented` enum'
-      tail' <- many $ itemLine (n+1)
-      return $ head':tail'
-
-item' :: Analyser Ast
-item' = do
-  oneOf "+-"
-  string " "
-  inlinemd Nothing
-
-enum' :: Analyser Ast
-enum' = do
-  many1 digit
-  string ". "
-  inlinemd Nothing
+itemization' n = (Itemization <$>) . many1 $ itemGroup n
 
 itemization :: Analyser Ast
-itemization = itemization' 0
-
-enumeration :: Analyser Ast
-enumeration = enumeration' 0
+itemization = (Itemization <$>) . many1 $ exactGroup 0
 
 \end{code}
 
@@ -495,7 +478,6 @@ section = do
         choice $
           map try $
           [ itemization,
-            enumeration,
             figure,
             inlinemd Nothing
           ]
@@ -513,10 +495,7 @@ article =
     choice
       [ try section,
         try itemization,
-        try enumeration,
-        try figure,
-        displayMath,
-        inlinemd Nothing
+        simpleLine
       ]
 
 \end{code}

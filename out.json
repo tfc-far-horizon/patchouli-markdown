@@ -6,23 +6,39 @@
                 {
                     "content": [
                         {
-                            "content": [
-                                {
-                                    "content": "and indented plain text",
-                                    "type": "plain"
-                                }
-                            ],
-                            "type": "paragraph"
-                        },
-                        {
                             "type": "itemization",
                             "items": [
                                 {
+                                    "content": {
+                                        "content": [
+                                            {
+                                                "content": "+ and first sub element",
+                                                "type": "plain"
+                                            }
+                                        ],
+                                        "type": "paragraph"
+                                    },
+                                    "type": "plain-item"
+                                },
+                                {
+                                    "content": {
+                                        "content": [
+                                            {
+                                                "content": "Plain text",
+                                                "type": "plain"
+                                            }
+                                        ],
+                                        "type": "paragraph"
+                                    },
+                                    "type": "plain-item"
+                                },
+                                {
                                     "content": [],
+                                    "type": "normal-item",
                                     "title": {
                                         "content": [
                                             {
-                                                "content": "and sub element",
+                                                "content": "another element",
                                                 "type": "plain"
                                             }
                                         ],
@@ -32,6 +48,7 @@
                             ]
                         }
                     ],
+                    "type": "normal-item",
                     "title": {
                         "content": [
                             {
@@ -41,20 +58,17 @@
                         ],
                         "type": "paragraph"
                     }
-                },
-                {
-                    "content": [],
-                    "title": {
-                        "content": [
-                            {
-                                "content": "second element",
-                                "type": "plain"
-                            }
-                        ],
-                        "type": "paragraph"
-                    }
                 }
             ]
+        },
+        {
+            "content": [
+                {
+                    "content": "Outer",
+                    "type": "plain"
+                }
+            ],
+            "type": "paragraph"
         }
     ],
     []
