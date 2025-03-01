@@ -141,7 +141,7 @@ $(DIST)/%.wasm: $(wildcard src/*.lhs) $(wildcard src/*.hs) igem-markdown.cabal
 # {}：表示匹配到的文件。
 # ./${DIST}/：表示目标目录。
 $(DIST)/ghc_wasm_jsffi.mjs: $(DIST)/analyser.wasm
-	$(call NVM, run, lts/jod) $$(wasm32-wasi-ghc --print-libdir)/post-link.mjs -i $< -o $@
+	$(call NVM, run, stable) $$(wasm32-wasi-ghc --print-libdir)/post-link.mjs -i $< -o $@
 # $(call NVM, run, lts/jod)：
 # $(call NVM, ...)：调用 NVM 宏。
 # run：表示调用 nvm run 命令。
