@@ -4,7 +4,7 @@ Parsers 模块定义了各个层级的 Parser，
 所有 Parser 有共同的签名： Analyser Ast
 
 \begin{code}
-module Parsers (article, parse, itemization) where
+module Parsers (article, parse, section, sectionTitle) where
 
 import Ast
 import Text.Parsec hiding (parse)
@@ -435,6 +435,7 @@ itemization = (Itemization <$>) . many1 $ exactGroup 0
 \begin{code}
 
 parseDay :: [CharUnit] -> Analyser (Maybe Day)
+parseDay [] = return Nothing
 parseDay d = do
   pos <- getPosition
   case parse day "date" $
@@ -446,17 +447,17 @@ parseDay d = do
           "\tnote: Date should take the `YYYY-MM-DD' format"
         ]
 
-sectionTitle :: Analyser (String, Maybe Day)
+sectionTitle :: Analyser (Ast, Maybe Day)
 sectionTitle = do
   charUnit ('#', False)
-  title <- t "#\n"
-  date <- choice $
-    [ charUnit ('#', False) *> t "\n",
+  title <- inlinemd $ Just ('#', False)
+  date <- choice $ map try $
+    [ t "\n",
       return $ toUnitString ""
     ]
   day <- parseDay date
   charUnit ('\n', False)
-  return (map fst title, day)
+  return (title, day)
   where
     t s = many (try $ noneUnitOf $ toUnitString s)
 
@@ -470,17 +471,15 @@ day = do
 section :: Analyser Ast
 section = do
   (title, date) <- sectionTitle
-  c <- many paragraph
+  c <- manyTill paragraph $ try (optional sectionTitle) <|> eof
   return $ Section title date c
   where
     paragraph =
-      try $
-        choice $
-          map try $
-          [ itemization,
-            figure,
-            inlinemd Nothing
-          ]
+      choice $
+        map try $
+        [ itemization,
+          simpleLine
+        ]
           -- section :: Analyser Ast:
           -- 定义了一个解析器 section，用于解析章节。
           -- (title, date) <- sectionTitle:

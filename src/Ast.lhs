@@ -32,7 +32,7 @@ import Data.Time.Calendar (Day, fromGregorian)
 data Ast
   = Paragraph {content :: [Ast]}
   | Section
-      { title :: String,
+      { title :: Ast,
         date :: Maybe Day,
         content :: [Ast]
       }

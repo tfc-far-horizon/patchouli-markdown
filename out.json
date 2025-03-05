@@ -1,75 +1,362 @@
 [
     [
         {
-            "type": "itemization",
-            "items": [
+            "content": [
                 {
                     "content": [
                         {
-                            "type": "itemization",
-                            "items": [
-                                {
-                                    "content": [],
-                                    "type": "normal-item",
-                                    "title": {
-                                        "content": [
-                                            {
-                                                "content": "first element",
-                                                "type": "plain"
-                                            }
-                                        ],
-                                        "type": "paragraph"
+                            "content": "some ",
+                            "type": "plain"
+                        },
+                        {
+                            "content": {
+                                "content": [
+                                    {
+                                        "content": "text",
+                                        "type": "plain"
                                     }
-                                },
-                                {
-                                    "content": {
-                                        "content": [
-                                            {
-                                                "content": "Plain text",
-                                                "type": "plain"
-                                            }
-                                        ],
-                                        "type": "paragraph"
-                                    },
-                                    "type": "plain-item"
-                                },
-                                {
-                                    "content": [],
-                                    "type": "normal-item",
-                                    "title": {
-                                        "content": [
-                                            {
-                                                "content": "another element",
-                                                "type": "plain"
-                                            }
-                                        ],
-                                        "type": "paragraph"
+                                ],
+                                "type": "paragraph"
+                            },
+                            "type": "italic"
+                        },
+                        {
+                            "content": " with ",
+                            "type": "plain"
+                        },
+                        {
+                            "content": "\\LaTeX",
+                            "type": "math",
+                            "mode": "inline"
+                        },
+                        {
+                            "content": " ",
+                            "type": "plain"
+                        },
+                        {
+                            "content": {
+                                "content": [
+                                    {
+                                        "content": "here",
+                                        "type": "plain"
                                     }
-                                }
-                            ]
+                                ],
+                                "type": "paragraph"
+                            },
+                            "type": "bold"
+                        },
+                        {
+                            "content": ", which ",
+                            "type": "plain"
+                        },
+                        {
+                            "content": {
+                                "content": [
+                                    {
+                                        "content": "may be",
+                                        "type": "plain"
+                                    }
+                                ],
+                                "type": "paragraph"
+                            },
+                            "type": "underlined"
+                        },
+                        {
+                            "content": " very ",
+                            "type": "plain"
+                        },
+                        {
+                            "content": {
+                                "content": [
+                                    {
+                                        "content": {
+                                            "content": [
+                                                {
+                                                    "content": "very",
+                                                    "type": "plain"
+                                                }
+                                            ],
+                                            "type": "paragraph"
+                                        },
+                                        "type": "bold"
+                                    }
+                                ],
+                                "type": "paragraph"
+                            },
+                            "type": "italic"
+                        },
+                        {
+                            "content": " long ",
+                            "type": "plain"
+                        },
+                        {
+                            "content": {
+                                "content": [
+                                    {
+                                        "content": {
+                                            "content": [
+                                                {
+                                                    "content": "long",
+                                                    "type": "plain"
+                                                }
+                                            ],
+                                            "type": "paragraph"
+                                        },
+                                        "type": "bold"
+                                    }
+                                ],
+                                "type": "paragraph"
+                            },
+                            "type": "underlined"
+                        },
+                        {
+                            "content": ", ",
+                            "type": "plain"
+                        },
+                        {
+                            "content": {
+                                "content": [
+                                    {
+                                        "content": "even wraps-the-line",
+                                        "type": "plain"
+                                    }
+                                ],
+                                "type": "paragraph"
+                            },
+                            "type": "italic"
                         }
                     ],
-                    "type": "normal-item",
-                    "title": {
+                    "type": "paragraph"
+                },
+                {
+                    "content": " display\\ mode\\ math\\ and\\ huge\\ operators\\ like \\sum_{i=1}^n ",
+                    "type": "math",
+                    "mode": "display"
+                },
+                {
+                    "content": [],
+                    "type": "paragraph"
+                },
+                {
+                    "content": [
+                        {
+                            "content": "and another line",
+                            "type": "plain"
+                        }
+                    ],
+                    "type": "paragraph"
+                },
+                {
+                    "content": [
+                        {
+                            "content": "#link and figure",
+                            "type": "plain"
+                        }
+                    ],
+                    "type": "paragraph"
+                },
+                {
+                    "content": [
+                        {
+                            "type": "link",
+                            "text": {
+                                "content": [
+                                    {
+                                        "content": "and a link",
+                                        "type": "plain"
+                                    }
+                                ],
+                                "type": "paragraph"
+                            },
+                            "link": "/"
+                        }
+                    ],
+                    "type": "paragraph"
+                },
+                {
+                    "type": "figure",
+                    "caption": {
                         "content": [
                             {
-                                "content": "test",
+                                "content": "and a figure",
                                 "type": "plain"
                             }
                         ],
                         "type": "paragraph"
-                    }
-                }
-            ]
-        },
-        {
-            "content": [
+                    },
+                    "path": "http://211.86.156.43:20090/uploads/original/f6/ef/4582994bed2becbde7c10c63df79.png"
+                },
                 {
-                    "content": "Outer",
-                    "type": "plain"
+                    "content": [],
+                    "type": "paragraph"
+                },
+                {
+                    "content": [
+                        {
+                            "content": "#lists",
+                            "type": "plain"
+                        }
+                    ],
+                    "type": "paragraph"
+                },
+                {
+                    "type": "itemization",
+                    "items": [
+                        {
+                            "content": [
+                                {
+                                    "type": "itemization",
+                                    "items": [
+                                        {
+                                            "content": {
+                                                "content": [
+                                                    {
+                                                        "content": "Plain text",
+                                                        "type": "plain"
+                                                    }
+                                                ],
+                                                "type": "paragraph"
+                                            },
+                                            "type": "plain-item"
+                                        },
+                                        {
+                                            "content": [
+                                                {
+                                                    "type": "itemization",
+                                                    "items": [
+                                                        {
+                                                            "content": [
+                                                                {
+                                                                    "type": "itemization",
+                                                                    "items": [
+                                                                        {
+                                                                            "content": {
+                                                                                "content": [
+                                                                                    {
+                                                                                        "content": "embedded text",
+                                                                                        "type": "plain"
+                                                                                    }
+                                                                                ],
+                                                                                "type": "paragraph"
+                                                                            },
+                                                                            "type": "plain-item"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "type": "normal-item",
+                                                            "title": {
+                                                                "content": [
+                                                                    {
+                                                                        "content": "and embedded element",
+                                                                        "type": "plain"
+                                                                    }
+                                                                ],
+                                                                "type": "paragraph"
+                                                            }
+                                                        },
+                                                        {
+                                                            "content": [],
+                                                            "type": "normal-item",
+                                                            "title": {
+                                                                "content": [
+                                                                    {
+                                                                        "content": "aligned element",
+                                                                        "type": "plain"
+                                                                    }
+                                                                ],
+                                                                "type": "paragraph"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            ],
+                                            "type": "normal-item",
+                                            "title": {
+                                                "content": [
+                                                    {
+                                                        "content": "another element",
+                                                        "type": "plain"
+                                                    }
+                                                ],
+                                                "type": "paragraph"
+                                            }
+                                        },
+                                        {
+                                            "content": {
+                                                "type": "figure",
+                                                "caption": {
+                                                    "content": [
+                                                        {
+                                                            "content": "and a figure",
+                                                            "type": "plain"
+                                                        }
+                                                    ],
+                                                    "type": "paragraph"
+                                                },
+                                                "path": "http://211.86.156.43:20090/uploads/original/f6/ef/4582994bed2becbde7c10c63df79.png"
+                                            },
+                                            "type": "plain-item"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "type": "normal-item",
+                            "title": {
+                                "content": [
+                                    {
+                                        "content": "test",
+                                        "type": "plain"
+                                    }
+                                ],
+                                "type": "paragraph"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "content": [],
+                    "type": "paragraph"
+                },
+                {
+                    "content": [
+                        {
+                            "content": "Outer",
+                            "type": "plain"
+                        }
+                    ],
+                    "type": "paragraph"
+                },
+                {
+                    "content": [
+                        {
+                            "content": "#display math wrapped",
+                            "type": "plain"
+                        }
+                    ],
+                    "type": "paragraph"
+                },
+                {
+                    "content": "\n\tdisplay\\ mode\\ math\\ that\\ wraps\\ the\\ line\\ in\\ source\\ code\n",
+                    "type": "math",
+                    "mode": "display"
+                },
+                {
+                    "content": [],
+                    "type": "paragraph"
                 }
             ],
-            "type": "paragraph"
+            "type": "section",
+            "date": "2025-03-05",
+            "title": {
+                "content": [
+                    {
+                        "content": "basic inline elements and math formulas",
+                        "type": "plain"
+                    }
+                ],
+                "type": "paragraph"
+            }
         }
     ],
     []
