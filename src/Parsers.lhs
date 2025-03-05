@@ -198,6 +198,7 @@ inlinemd m = do
             return . Paragraph . (:[]) . Plain $ plaintext content ++ ('[':t)
           _ -> error $ show prependee
       ('\n', False) -> case m of
+        Just ('#', False) -> return $ Paragraph [content]
         Just u -> unexpected $ "end of line\n, expecting" ++ withslash u
         Nothing -> char '\n' *> (return . Paragraph $ [content])
       _ -> error "unknown error"
@@ -471,7 +472,7 @@ day = do
 section :: Analyser Ast
 section = do
   (title, date) <- sectionTitle
-  c <- manyTill paragraph $ try (optional sectionTitle) <|> eof
+  c <- manyTill paragraph $ try (lookAhead sectionTitle *> return ()) <|> eof
   return $ Section title date c
   where
     paragraph =

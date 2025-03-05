@@ -14,7 +14,7 @@ and another line
 		+ aligned element
 	![and a figure](http://211.86.156.43:20090/uploads/original/f6/ef/4582994bed2becbde7c10c63df79.png)
 Outer
-#display math wrapped
+#display math wrapped and $inline~\LaTeX~in~title$
 \[
 	display\ mode\ math\ that\ wraps\ the\ line\ in\ source\ code
 \]

@@ -145,16 +145,22 @@
                         }
                     ],
                     "type": "paragraph"
-                },
-                {
-                    "content": [
-                        {
-                            "content": "#link and figure",
-                            "type": "plain"
-                        }
-                    ],
-                    "type": "paragraph"
-                },
+                }
+            ],
+            "type": "section",
+            "date": "2025-03-05",
+            "title": {
+                "content": [
+                    {
+                        "content": "basic inline elements and math formulas",
+                        "type": "plain"
+                    }
+                ],
+                "type": "paragraph"
+            }
+        },
+        {
+            "content": [
                 {
                     "content": [
                         {
@@ -189,16 +195,22 @@
                 {
                     "content": [],
                     "type": "paragraph"
-                },
-                {
-                    "content": [
-                        {
-                            "content": "#lists",
-                            "type": "plain"
-                        }
-                    ],
-                    "type": "paragraph"
-                },
+                }
+            ],
+            "type": "section",
+            "date": null,
+            "title": {
+                "content": [
+                    {
+                        "content": "link and figure",
+                        "type": "plain"
+                    }
+                ],
+                "type": "paragraph"
+            }
+        },
+        {
+            "content": [
                 {
                     "type": "itemization",
                     "items": [
@@ -326,16 +338,22 @@
                         }
                     ],
                     "type": "paragraph"
-                },
-                {
-                    "content": [
-                        {
-                            "content": "#display math wrapped",
-                            "type": "plain"
-                        }
-                    ],
-                    "type": "paragraph"
-                },
+                }
+            ],
+            "type": "section",
+            "date": null,
+            "title": {
+                "content": [
+                    {
+                        "content": "lists",
+                        "type": "plain"
+                    }
+                ],
+                "type": "paragraph"
+            }
+        },
+        {
+            "content": [
                 {
                     "content": "\n\tdisplay\\ mode\\ math\\ that\\ wraps\\ the\\ line\\ in\\ source\\ code\n",
                     "type": "math",
@@ -347,12 +365,17 @@
                 }
             ],
             "type": "section",
-            "date": "2025-03-05",
+            "date": null,
             "title": {
                 "content": [
                     {
-                        "content": "basic inline elements and math formulas",
+                        "content": "display math wrapped and ",
                         "type": "plain"
+                    },
+                    {
+                        "content": "inline~\\LaTeX~in~title",
+                        "type": "math",
+                        "mode": "inline"
                     }
                 ],
                 "type": "paragraph"
