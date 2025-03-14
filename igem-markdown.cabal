@@ -65,11 +65,29 @@ common depends
 common modules
     other-modules:    Ast
                     , Parsers
+                    -- Inline compositors
+                    , Ast.Plain
+                    , Ast.Paragraph
+                    -- Emphasised
+                    , Ast.Emphasis
+                    -- Math
+                    , Ast.Math
+                    -- Itemization
+                    , Ast.Itemization
+                    -- Section
+                    , Ast.Section
+                    -- Link
+                    , Ast.Link
+                    -- Figure
+                    , Ast.Figure
     hs-source-dirs:   src
 
 common languageversion
     default-language: Haskell2010
-    default-extensions: OverloadedStrings
+    default-extensions:   OverloadedStrings
+                        , ExistentialQuantification
+                        , AllowAmbiguousTypes
+                        , TypeApplications
 
 executable compiler
     import:  warnings
