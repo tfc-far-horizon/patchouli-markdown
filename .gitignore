@@ -7,7 +7,8 @@ docs/
 .vscode/
 *.sublime-*
 
-*lock*
+yarn.lock
+package-lock.json
 node_modules/
 web/
 
