@@ -18,3 +18,7 @@ Outer
 \[
 	display\ mode\ math\ that\ wraps\ the\ line\ in\ source\ code
 \]
+#code-block
+	```javascript=
+	console.log('hello,\n world')
+	```

@@ -1,8 +1,8 @@
 module Ast.Figure where
 
 import Ast
-import Data.Aeson
 import Ast.Paragraph
+import Data.Aeson
 
 data Figure = Figure
   { path :: String,

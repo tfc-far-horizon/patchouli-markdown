@@ -10,6 +10,7 @@ module Ast where
 
 import Data.Aeson
 import Data.Text (Text)
+
 type CharUnit = (Char, Bool)
 \end{code}
 
@@ -19,15 +20,14 @@ type CharUnit = (Char, Bool)
 
 \begin{code}
 
-class ToJSON a => AstNode a
+class (ToJSON a) => AstNode a
 
-data Ast = forall a. AstNode a => Ast a
+data Ast = forall a. (AstNode a) => Ast a
 
-class AstNode a => InlineAstNode a where
+class (AstNode a) => InlineAstNode a where
   shouldDrop :: a -> Bool
 
-
-data InlineAst = forall a. InlineAstNode a => InlineAst a
+data InlineAst = forall a. (InlineAstNode a) => InlineAst a
 
 (.::) :: Key -> Text -> (Key, Value)
 l .:: r = l .= String r
@@ -53,7 +53,8 @@ instance ToJSON Ast where
 
 instance Show Ast where
   show (Ast a) = show $ encode a
-  -- 为 Ast 提供了 Show 实例，通过将 Ast 编码为 JSON 字符串来显示。
+
+-- 为 Ast 提供了 Show 实例，通过将 Ast 编码为 JSON 字符串来显示。
 
 
 \end{code}

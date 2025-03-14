@@ -1,8 +1,8 @@
 module Ast.Link where
 
 import Ast
-import Data.Aeson
 import Ast.Paragraph
+import Data.Aeson
 
 data Link = Link
   { text :: Paragraph,

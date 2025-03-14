@@ -80,6 +80,8 @@ common modules
                     , Ast.Link
                     -- Figure
                     , Ast.Figure
+                    -- CodeBlock
+                    , Ast.CodeBlock
     hs-source-dirs:   src
 
 common languageversion

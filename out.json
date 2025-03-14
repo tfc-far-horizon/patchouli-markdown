@@ -380,6 +380,31 @@
                 ],
                 "type": "paragraph"
             }
+        },
+        {
+            "content": [
+                {
+                    "content": "console.log('hello,\\n world')\n",
+                    "type": "code-block",
+                    "language": "javascript",
+                    "line-number": 0
+                },
+                {
+                    "content": [],
+                    "type": "paragraph"
+                }
+            ],
+            "type": "section",
+            "date": null,
+            "title": {
+                "content": [
+                    {
+                        "content": "code-block",
+                        "type": "plain"
+                    }
+                ],
+                "type": "paragraph"
+            }
         }
     ],
     []
