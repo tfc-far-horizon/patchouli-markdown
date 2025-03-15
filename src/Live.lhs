@@ -3,13 +3,16 @@
 module Main (parsemd, main) where
 import Parsers
 -- 导入解析器模块
-import Data.Aeson (encode)
+import Data.Aeson (encode, ToJSON)
 -- 导入 Aeson 库，用于 JSON 编码
 import GHC.Wasm.Prim
 -- 导入 WebAssembly 相关的 GHC 函数
-import qualified Data.ByteString.Lazy.Char8 as BL  
--- 导入 Lazy ByteString 模块
+import Data.Aeson.Text (encodeToTextBuilder)
+import qualified Data.Text.Lazy as TL
+import qualified Data.Text.Lazy.Builder as TB
 
+toJSONString :: ToJSON a => a -> String
+toJSONString = TL.unpack . TB.toLazyText . encodeToTextBuilder
 
   -- 为 WebAssembly 模块导出名为 ``parse'' 的 JavaScript 函数，
   -- 用于解析 Markdown 文件。
@@ -25,7 +28,7 @@ parsemd :: JSString -> JSString
 parsemd md = case parse article "stdin" (fromJSString md) of
   Left e -> toJSString $ show e  -- 解析失败，返回错误信息
   Right w ->                         -- 解析成功
-    toJSString $ BL.unpack $ encode w  -- 将 AST 编码为 JSON 并返回
+    toJSString $ toJSONString w  -- 将 AST 编码为 JSON 并返回
 
 
   -- 导出名为 ``problems'' 的 JavaScript 函数，
@@ -40,6 +43,9 @@ problems md = case parse article "stdin" (fromJSString md) of
   Right (_, w) -> length w  -- 解析成功，返回 warning 的数量
 
   -- 主函数，被 ghc 的 wasm 后端在编译时舍弃。
+
+foreign export javascript returns :: JSString -> JSString
+returns x = toJSString $ toJSONString $ fromJSString $ x
 
 main :: IO ()
 main = do

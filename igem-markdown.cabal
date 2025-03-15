@@ -111,5 +111,5 @@ executable analyser
     ghc-options:
         -no-hs-main
         -optl-mexec-model=reactor
-        "-optl-Wl,--export=hs_init,--export=parse,--export=problems"
+        "-optl-Wl,--export=hs_init,--export=parse,--export=problems,--export=returns"
 
