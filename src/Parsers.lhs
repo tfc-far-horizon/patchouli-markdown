@@ -4,10 +4,21 @@ Parsers 模块定义了各个层级的 Parser，
 所有 Parser 有共同的签名： Analyser Ast
 
 \begin{code}
-module Parsers (article, parse, section, sectionTitle) where
+module Parsers where
 
 import Ast
+import Ast.CodeBlock
+import Ast.Emphasis
+import Ast.Figure
+import Ast.Itemization
+import Ast.Link
+import Ast.Math
+import Ast.Paragraph
+import Ast.Plain
+import Ast.Section
+import Data.Time.Calendar
 import Text.Parsec hiding (parse)
+
 -- module Parsers (article, parse, section) where:
 -- 定义了一个名为 Parsers 的模块。
 -- 模块导出了 article、parse 和 section 三个函数。
@@ -18,12 +29,13 @@ import Text.Parsec hiding (parse)
 -- hiding (parse) 表示隐藏 Text.Parsec 模块中的 parse 函数，
 -- 避免与本地定义的 parse 函数冲突。
 
-type Analyser = Parsec 
-  String   -- 输入给 parser 的内容
-  [String] -- 存放warning的位置
+type Analyser =
+  Parsec
+    String -- 输入给 parser 的内容
+    [String] -- 存放warning的位置
 
 warn :: Analyser a -> String -> Analyser a
-warn p s = modifyState (s:) *> p
+warn p s = modifyState (s :) *> p
 
 -- type Analyser = Parsec String [String]:
 -- 定义了一个类型别名 Analyser，表示一个 Parsec 解析器。
@@ -36,7 +48,8 @@ warn p s = modifyState (s:) *> p
 -- s 是要添加的警告信息。
 -- modifyState (s:) *> p:
 -- modifyState (s:) 将警告信息 s 添加到状态中。
--- *> 是 Applicative 操作符，用于忽略 modifyState 的返回值，继续执行 p。
+
+-- * > 是 Applicative 操作符，用于忽略 modifyState 的返回值，继续执行 p。
 
 parse :: Analyser a -> String -> String -> Either ParseError (a, [String])
 parse p name input = runParser p' [] name input
@@ -46,21 +59,21 @@ parse p name input = runParser p' [] name input
       r <- getState
       return (l, r)
 
-      -- parse :: Analyser a -> String -> String -> Either ParseError (a, [String]):
-      -- 定义了一个 parse 函数，用于运行解析器并返回解析结果。
-      -- p 是解析器。
-      -- name 是输入文件的名称。
-      -- input 是输入的字符串。
-      -- 返回值是一个 Either 类型，表示解析结果：
-      -- Left ParseError 表示解析失败，返回解析错误。
-      -- Right (a, [String]) 表示解析成功，返回解析结果 a 和警告信息列表 [String]。
-      -- runParser p' [] name input:
-      -- runParser 是 Text.Parsec 模块中的函数，用于运行解析器。
-      -- p' 是一个修改后的解析器，用于捕获解析结果和状态。
-      -- p' = do:
-      -- l <- p 运行解析器 p，并将结果绑定到 l。
-      -- r <- getState 获取解析器的状态（警告信息列表），并绑定到 r。
-      -- return (l, r) 返回解析结果和状态。
+-- parse :: Analyser a -> String -> String -> Either ParseError (a, [String]):
+-- 定义了一个 parse 函数，用于运行解析器并返回解析结果。
+-- p 是解析器。
+-- name 是输入文件的名称。
+-- input 是输入的字符串。
+-- 返回值是一个 Either 类型，表示解析结果：
+-- Left ParseError 表示解析失败，返回解析错误。
+-- Right (a, [String]) 表示解析成功，返回解析结果 a 和警告信息列表 [String]。
+-- runParser p' [] name input:
+-- runParser 是 Text.Parsec 模块中的函数，用于运行解析器。
+-- p' 是一个修改后的解析器，用于捕获解析结果和状态。
+-- p' = do:
+-- l <- p 运行解析器 p，并将结果绑定到 l。
+-- r <- getState 获取解析器的状态（警告信息列表），并绑定到 r。
+-- return (l, r) 返回解析结果和状态。
 
 \end{code}
 
@@ -89,8 +102,6 @@ toUnit 和 toUnitString 是
 
 \begin{code}
 
-type CharUnit = (Char, Bool)
-
 anyCharUnit :: Analyser CharUnit
 anyCharUnit = do
   c <- anyChar
@@ -107,16 +118,16 @@ anyCharUnit = do
         _ -> return (n, True)
     _ -> return (c, False)
 
-    -- type CharUnit = (Char, Bool):
-    -- 定义了一个类型别名 CharUnit，表示一个字符及其是否被转义。
-    -- anyCharUnit :: Analyser CharUnit:
-    -- 定义了一个解析器 anyCharUnit，用于解析一个字符元。
-    -- anyChar 是 Text.Parsec 模块中的函数，用于解析一个字符。
-    -- case c of 根据字符 c 的值进行模式匹配：
-    -- `\textbackslash r'：处理回车符，尝试解析换行符 \textbackslash n。
-    -- `\textbackslash n'：处理换行符，直接返回。
-    -- `\textbackslash \textbackslash'：处理转义符，解析下一个字符并标记为转义。
-    -- 其他字符：直接返回，标记为未转义。
+-- type CharUnit = (Char, Bool):
+-- 定义了一个类型别名 CharUnit，表示一个字符及其是否被转义。
+-- anyCharUnit :: Analyser CharUnit:
+-- 定义了一个解析器 anyCharUnit，用于解析一个字符元。
+-- anyChar 是 Text.Parsec 模块中的函数，用于解析一个字符。
+-- case c of 根据字符 c 的值进行模式匹配：
+-- `\textbackslash r'：处理回车符，尝试解析换行符 \textbackslash n。
+-- `\textbackslash n'：处理换行符，直接返回。
+-- `\textbackslash \textbackslash'：处理转义符，解析下一个字符并标记为转义。
+-- 其他字符：直接返回，标记为未转义。
 
 withslash :: CharUnit -> String
 withslash (c, True) = ['\\', c]
@@ -160,7 +171,7 @@ noneUnitOf cs = do
 
 \begin{code}
 
-inlinemd :: Maybe CharUnit -> Analyser Ast
+inlinemd :: Maybe CharUnit -> Analyser Paragraph
 inlinemd m = do
   let symbols' = case m of
         Just m' -> m' : symbols
@@ -168,7 +179,7 @@ inlinemd m = do
   content <- Plain . map fst <$> many (try (noneUnitOf symbols'))
   symbol <- lookAhead anyCharUnit
   if Just symbol == m
-    then charUnit symbol *> return (Paragraph [content])
+    then charUnit symbol *> return (Paragraph . map InlineAst $ [content])
     else case symbol of
       ('$', False) -> content `prepend` inlineMath
       ('[', True) ->
@@ -180,34 +191,28 @@ inlinemd m = do
       ('*', False) -> content `prepend` emphasis ('*', False)
       ('^', False) -> content `prepend` emphasis ('^', False)
       ('_', False) -> content `prepend` emphasis ('_', False)
-      ('[', False) -> do
-        prependee <-
-          try link
-            <|>
-            -- 此处并没有手动左结合而是直接 try link，
-            -- 因此在目标不是链接时会回退整个中括号块，
-            -- 但这个性能损失我觉得还能接受
-            char '['
-            *> inlinemd m
-        case prependee of
-          (Link _ _) -> do
+      ('[', False) ->
+        try $
+          do
+            prependee <- link
             (Paragraph (inline : inlines)) <- inlinemd m
             return . Paragraph $
-              content : prependee : inline : inlines
-          Paragraph [(Plain t)] ->
-            return . Paragraph . (:[]) . Plain $ plaintext content ++ ('[':t)
-          _ -> error $ show prependee
+              InlineAst content : InlineAst prependee : inline : inlines
+            <|> do
+              charUnit ('[', False)
+              Paragraph ls <- inlinemd $ Just (']', False)
+              return . Paragraph $ InlineAst (Plain "[") : ls
       ('\n', False) -> case m of
-        Just ('#', False) -> return $ Paragraph [content]
+        Just ('#', False) -> return $ Paragraph . map InlineAst $ [content]
         Just u -> unexpected $ "end of line\n, expecting" ++ withslash u
-        Nothing -> char '\n' *> (return . Paragraph $ [content])
+        Nothing -> char '\n' *> (return . Paragraph . map InlineAst $ [content])
       _ -> error "unknown error"
   where
-    prepend :: Ast -> Analyser Ast -> Analyser Ast
+    prepend :: (InlineAstNode a) => Plain -> Analyser a -> Analyser Paragraph
     prepend c p = do
       prependee <- p
       (Paragraph inline) <- inlinemd m
-      return . Paragraph $ c : prependee : inline
+      return . Paragraph $ InlineAst c : InlineAst prependee : inline
 
     symbols :: [CharUnit]
     symbols =
@@ -257,24 +262,26 @@ display mode （行间公式）必须单独成行。
 
 \begin{code}
 
-inlineMath :: Analyser Ast
-  -- 定义了一个解析器 inlineMath，用于解析行内数学公式。
+inlineMath :: Analyser Math
+-- 定义了一个解析器 inlineMath，用于解析行内数学公式。
 inlineMath = do
   charUnit ('$', False) -- 解析一个 \$ 符号，表示数学公式的开始。
-  pos <- getPosition    -- 获取当前解析位置。
+  pos <- getPosition -- 获取当前解析位置。
   formula <-
     concat . map withslash
       <$> many (try $ noneUnitOf [('$', False), ('\n', False)])
   -- 解析数学公式的内容，直到遇到 \$ 或换行符。
   (try $ charUnit ('$', False)) -- 尝试解析一个 \$ 符号，表示数学公式的结束。
-    <|> return ('$', False) `warn` unlines 
+    <|> return ('$', False)
+    `warn` unlines
       [ "unenclosed inline math environment",
         "note: math env began at" ++ show pos
       ] -- 如果解析失败，添加警告信息。
   return . Math formula $ False
-  -- 返回一个 Math 节点，表示数学公式。
 
-displayMath :: Analyser Ast
+-- 返回一个 Math 节点，表示数学公式。
+
+displayMath :: Analyser Math
 displayMath = do
   (try $ charUnit ('[', True)) <|> unexpected "not beginner of displayMath"
   pos <- getPosition
@@ -302,18 +309,18 @@ displayMath = do
 
 \begin{code}
 
-link :: Analyser Ast
+link :: Analyser Link
 link = do
   text <-
     charUnit ('[', False)
       *> inlinemd (Just (']', False))
-  link <- 
-    charUnit ('(', False) *>
-      (many $ try $ noneUnitOf [(')',False),('\n',False)])
+  link <-
+    charUnit ('(', False)
+      *> (many $ try $ noneUnitOf [(')', False), ('\n', False)])
       <* charUnit (')', False)
   return . Link text $ map fst $ link
 
-figure :: Analyser Ast
+figure :: Analyser Figure
 figure = do
   (Link text link) <- charUnit ('!', False) *> link
   return $ Figure link text
@@ -340,7 +347,7 @@ return . Link text \$ map fst \$ link:
 
 \begin{code}
 
-emphasis :: CharUnit -> Analyser Ast
+emphasis :: CharUnit -> Analyser Emphasis
 emphasis symbol = do
   emphasised <- do
     charUnit symbol
@@ -361,6 +368,51 @@ emphasised <- charUnit symbol *> inlinemd (Just symbol):
 
 return . Emphasis emphasised \$ case fst symbol of:
 根据强调符号的值，返回一个 Emphasis 节点，表示强调内容。
+
+\section{代码片段}
+
+在 igem-markdown 中，我们提供代码片段功能，
+以在 markdown 中嵌入代码。
+
+代码片段需另起一行，
+以若干个连续的 \tick 开头，
+相同数量的 \tick 结尾。
+中间的书写如同正常的代码。
+
+在开头和结尾的 \tick 前可以加入若干个相同数量的 tab，
+表示这一段的所有代码前都有这么多个缩进。
+
+\begin{code}
+
+count'number :: Analyser a -> Analyser Int
+count'number p = do
+  list <- many $ try p
+  return $ length list
+
+code'block :: Analyser CodeBlock
+code'block = do
+  indents <- count'number $ charUnit ('\t', False)
+  charUnit ('`', False)
+  ticks' <- count'number $ charUnit ('`', False)
+  let ticks = ticks' + 1
+  language <- many $ try $ noneUnitOf $ toUnitString "=\n"
+  lineno <-
+    ( try $ do
+        charUnit ('=', False)
+        start'lineno <- option "0" $ many1 $ try digit
+        char '\n'
+        return $ Just $ read start'lineno
+    )
+      <|> char '\n'
+      *> return Nothing
+  code <- indents `indented` line `manyTill` try (indents `indented` count ticks (char '`'))
+  char '\n'
+  return $ CodeBlock (map fst language) (unlines code) lineno
+  where
+    line :: Analyser String
+    line = (concat . map withslash <$>) . manyTill anyCharUnit $ try $ charUnit ('\n', False)
+
+\end{code}
 
 \section{列表}
 
@@ -384,13 +436,16 @@ indented :: Int -> Analyser p -> Analyser p
 indented n = (count n (char '\t') *>)
 
 simpleLine :: Analyser Ast
-simpleLine = choice . map try $ [
-  figure,
-  displayMath,
-  inlinemd Nothing
-  ]
+simpleLine =
+  choice . map try $
+    [ Ast <$> figure,
+      Ast <$> displayMath,
+      Ast <$> code'block,
+      Ast <$> inlinemd Nothing
+    ]
 
 infix 3 `try_else`
+
 try_else :: ParsecT s u m a -> ParsecT s u m a -> ParsecT s u m a
 try_else u v = try u <|> try v
 
@@ -400,20 +455,20 @@ itemGroup n =
 
 exactGroup :: Int -> Analyser ItemGroup
 exactGroup n = do
-    title' <- n `indented` item'title
-    content' <- many $ itemization' $ n + 1
-    return $ Normal'Item title' content'
+  title' <- n `indented` item'title
+  content' <- many $ itemization' $ n + 1
+  return $ Normal'Item title' content'
   where
-    item'title :: Analyser Ast
+    item'title :: Analyser Paragraph
     item'title = do
       oneOf "+-"
       char ' '
       inlinemd Nothing
 
-itemization' :: Int -> Analyser Ast
+itemization' :: Int -> Analyser Itemization
 itemization' n = (Itemization <$>) . many1 $ itemGroup n
 
-itemization :: Analyser Ast
+itemization :: Analyser Itemization
 itemization = (Itemization <$>) . many1 $ exactGroup 0
 
 \end{code}
@@ -440,22 +495,27 @@ parseDay [] = return Nothing
 parseDay d = do
   pos <- getPosition
   case parse day "date" $
-    map fst $ d of
-      Right date -> return $ Just $ fst date
-      Left _ -> return Nothing `warn` unlines
-        [ "Invalid date format at " ++ show pos,
-          "\tnote: everything after the second '#' will be dropped.",
-          "\tnote: Date should take the `YYYY-MM-DD' format"
-        ]
+    map fst $
+      d of
+    Right date -> return $ Just $ fst date
+    Left _ ->
+      return Nothing
+        `warn` unlines
+          [ "Invalid date format at " ++ show pos,
+            "\tnote: everything after the second '#' will be dropped.",
+            "\tnote: Date should take the `YYYY-MM-DD' format"
+          ]
 
-sectionTitle :: Analyser (Ast, Maybe Day)
+sectionTitle :: Analyser (Paragraph, Maybe Day)
 sectionTitle = do
   charUnit ('#', False)
   title <- inlinemd $ Just ('#', False)
-  date <- choice $ map try $
-    [ t "\n",
-      return $ toUnitString ""
-    ]
+  date <-
+    choice $
+      map try $
+        [ t "\n",
+          return $ toUnitString ""
+        ]
   day <- parseDay date
   charUnit ('\n', False)
   return (title, day)
@@ -469,7 +529,7 @@ day = do
   day <- read <$> count 2 digit
   return $ fromGregorian year month day
 
-section :: Analyser Ast
+section :: Analyser Section
 section = do
   (title, date) <- sectionTitle
   c <- manyTill paragraph $ try (lookAhead sectionTitle *> return ()) <|> eof
@@ -478,23 +538,24 @@ section = do
     paragraph =
       choice $
         map try $
-        [ itemization,
-          simpleLine
-        ]
-          -- section :: Analyser Ast:
-          -- 定义了一个解析器 section，用于解析章节。
-          -- (title, date) <- sectionTitle:
-          -- 解析章节标题和日期。
-          -- c <- many paragraph:
-          -- 解析章节内容。
-          -- return \$ Section title date c:
-          -- 返回一个 Section 节点，表示章节。
+          [ Ast <$> itemization,
+            simpleLine
+          ]
+
+-- section :: Analyser Ast:
+-- 定义了一个解析器 section，用于解析章节。
+-- (title, date) <- sectionTitle:
+-- 解析章节标题和日期。
+-- c <- many paragraph:
+-- 解析章节内容。
+-- return \$ Section title date c:
+-- 返回一个 Section 节点，表示章节。
 article :: Analyser [Ast]
 article =
   many $
     choice
-      [ try section,
-        try itemization,
+      [ Ast <$> try section,
+        Ast <$> try itemization,
         simpleLine
       ]
 

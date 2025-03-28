@@ -65,11 +65,29 @@ common depends
 common modules
     other-modules:    Ast
                     , Parsers
+                    -- Inline compositors
+                    , Ast.Plain
+                    , Ast.Paragraph
+                    -- Emphasised
+                    , Ast.Emphasis
+                    -- Math
+                    , Ast.Math
+                    -- Itemization
+                    , Ast.Itemization
+                    -- Section
+                    , Ast.Section
+                    -- Link
+                    , Ast.Link
+                    -- Figure
+                    , Ast.Figure
+                    -- CodeBlock
+                    , Ast.CodeBlock
     hs-source-dirs:   src
 
 common languageversion
     default-language: Haskell2010
-    default-extensions: OverloadedStrings
+    default-extensions:   OverloadedStrings
+                        , ExistentialQuantification
 
 executable compiler
     import:  warnings
@@ -91,5 +109,5 @@ executable analyser
     ghc-options:
         -no-hs-main
         -optl-mexec-model=reactor
-        "-optl-Wl,--export=hs_init,--export=parse,--export=problems"
+        "-optl-Wl,--export=hs_init,--export=parse,--export=problems,--export=returns"
 
