@@ -384,27 +384,17 @@
         {
             "content": [
                 {
-                    "content": "console.log('hello,\\n world')\n",
-                    "type": "code-block",
-                    "language": "javascript",
-                    "line-number": 0
-                },
-                {
-                    "content": [],
-                    "type": "paragraph"
+                    "content": "#code-block",
+                    "type": "plain"
                 }
             ],
-            "type": "section",
-            "date": null,
-            "title": {
-                "content": [
-                    {
-                        "content": "code-block",
-                        "type": "plain"
-                    }
-                ],
-                "type": "paragraph"
-            }
+            "type": "paragraph"
+        },
+        {
+            "content": "console.log('hello,\\n world')\n",
+            "type": "code-block",
+            "language": "javascript",
+            "line-number": 2
         }
     ],
     []

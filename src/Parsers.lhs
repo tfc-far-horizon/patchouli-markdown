@@ -396,12 +396,17 @@ code'block = do
   ticks' <- count'number $ charUnit ('`', False)
   let ticks = ticks' + 1
   language <- many $ try $ noneUnitOf $ toUnitString "=\n"
-  lineno <- option Nothing $ do
-    charUnit ('=', False)
-    start'lineno <- option "0" $ many1 $ try digit
-    char '\n'
-    return $ Just $ read @Int start'lineno
+  lineno <-
+    ( try $ do
+        charUnit ('=', False)
+        start'lineno <- option "0" $ many1 $ try digit
+        char '\n'
+        return $ Just $ read start'lineno
+    )
+      <|> char '\n'
+      *> return Nothing
   code <- indents `indented` line `manyTill` try (indents `indented` count ticks (char '`'))
+  char '\n'
   return $ CodeBlock (map fst language) (unlines code) lineno
   where
     line :: Analyser String
