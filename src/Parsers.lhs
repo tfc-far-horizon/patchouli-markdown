@@ -16,8 +16,11 @@ import Ast.Math
 import Ast.Paragraph
 import Ast.Plain
 import Ast.Section
+import Ast.Table
 import Data.Time.Calendar
 import Text.Parsec hiding (parse)
+import Data.Functor (($>))
+import Control.Monad (guard)
 
 -- module Parsers (article, parse, section) where:
 -- 定义了一个名为 Parsers 的模块。
@@ -179,7 +182,7 @@ inlinemd m = do
   content <- Plain . map fst <$> many (try (noneUnitOf symbols'))
   symbol <- lookAhead anyCharUnit
   if Just symbol == m
-    then charUnit symbol *> return (Paragraph . map InlineAst $ [content])
+    then charUnit symbol $> (Paragraph . map InlineAst $ [content])
     else case symbol of
       ('$', False) -> content `prepend` inlineMath
       ('[', True) ->
@@ -473,6 +476,73 @@ itemization = (Itemization <$>) . many1 $ exactGroup 0
 
 \end{code}
 
+\section{表格}
+
+\begin{code}
+
+table'row :: Analyser [Paragraph]
+table'row = do
+  charUnit ('|', False)
+  blocks <-
+    many $
+      try $
+        inlinemd $
+          Just ('|', False)
+  guard $ not $ null blocks
+  charUnit ('\n', False)
+  return blocks
+
+align'cell :: Analyser Align
+align'cell = do
+  many . try $ charUnit (' ', False)
+  left <-
+    ( do
+        try $ charUnit (':', False)
+        return True
+    )
+      <|> return False
+  many $ try $ charUnit ('-', False)
+  right <-
+    ( do
+        try $ charUnit (':', False)
+        return True
+    )
+      <|> return False
+  many . try $ charUnit (' ', False)
+  return $ case (left, right) of
+    (True, True) -> Align'Center
+    (False, True) -> Align'Right
+    _ -> Align'Left
+
+table'align :: Analyser [Align]
+table'align =
+  ( do
+      charUnit ('|', False)
+      many $ try (align'cell <* charUnit ('|', False))
+  )
+    <* charUnit ('\n', False)
+
+cells'from'para :: [Align] -> Bool -> [Paragraph] -> [Table'Cell]
+cells'from'para aligns header p =
+  [ Table'Cell
+      header
+      align'
+      p'
+  | (align', p') <- zip aligns p
+  ]
+
+table :: Analyser Table
+table = do
+  header <- table'row
+  aligns <- table'align
+  rows <- many $ try table'row
+  return
+    $ Table
+      (cells'from'para aligns True header)
+    $ map (cells'from'para aligns False) rows
+
+\end{code}
+
 \section{标题和章节}
 
 在 igem-markdown 中，我们提供使用标题分割章节的功能，
@@ -495,15 +565,16 @@ parseDay [] = return Nothing
 parseDay d = do
   pos <- getPosition
   case parse day "date" $
-    map fst $
+    map
+      fst
       d of
     Right date -> return $ Just $ fst date
     Left _ ->
       return Nothing
         `warn` unlines
-          [ "Invalid date format at " ++ show pos,
-            "\tnote: everything after the second '#' will be dropped.",
-            "\tnote: Date should take the `YYYY-MM-DD' format"
+          [ "Invalid date format at " ++ show pos
+          , "\tnote: everything after the second '#' will be dropped."
+          , "\tnote: Date should take the `YYYY-MM-DD' format"
           ]
 
 sectionTitle :: Analyser (Paragraph, Maybe Day)
@@ -512,7 +583,7 @@ sectionTitle = do
   title <- inlinemd $ Just ('#', False)
   date <-
     choice $
-      map try $
+      map try
         [ t "\n",
           return $ toUnitString ""
         ]
@@ -532,12 +603,12 @@ day = do
 section :: Analyser Section
 section = do
   (title, date) <- sectionTitle
-  c <- manyTill paragraph $ try (lookAhead sectionTitle *> return ()) <|> eof
+  c <- manyTill paragraph $ try (lookAhead sectionTitle $> ()) <|> eof
   return $ Section title date c
   where
     paragraph =
       choice $
-        map try $
+        map try
           [ Ast <$> itemization,
             simpleLine
           ]
@@ -554,7 +625,8 @@ article :: Analyser [Ast]
 article =
   many $
     choice
-      [ Ast <$> try section,
+      [ Ast <$> try table,
+        Ast <$> try section,
         Ast <$> try itemization,
         simpleLine
       ]

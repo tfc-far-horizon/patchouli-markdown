@@ -1,3 +1,11 @@
+| 姓名   | 年龄 | 成绩   |
+| ------ | ---: | :---: |
+| Tom    |  12  |  优秀  |
+| Jerry  |   9  |  良好  |
+| Alice  |  11  |  中等  |
+
+
+
 #basic inline elements and math formulas#2025-03-05
 some *text* with $\LaTeX$ ^here^, which _may be_ very *^very^* long _^long^_, *even wraps-the-line*
 \[ display\ mode\ math\ and\ huge\ operators\ like \sum_{i=1}^n \]
@@ -23,3 +31,4 @@ Outer
 	console.log('hello,\n world')
 	```
 test
+

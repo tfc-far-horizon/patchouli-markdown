@@ -26,8 +26,8 @@ instance ToJSON EmphasisType where
 instance ToJSON Emphasis where
   toJSON (Emphasis asts t) =
     object
-      [ "type" .= t,
-        "content" .= asts
+      [ "type" .= t
+      , "content" .= asts
       ]
 
 instance AstNode Emphasis

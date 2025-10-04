@@ -4,12 +4,12 @@ RED :=
 RESET := 
 BLUE := 
 
-export SHELL=/bin/bash
+export SHELL=/bin/zsh
 TEXTEMPDIR = texworks
 
 # CABAL = if command -v wasm32-wasi-cabal &>/dev/null; then wasm32-wasi-cabal; else cabal --with-compiler=
 define CABAL
-	wasm32-wasi-cabal $(1) $(2) $(3)
+	cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg --with-hsc2hs=wasm32-wasi-hsc2hs $(1) $(2) $(3)
 endef
 
 #   env -i GHCRTS=-H64m "$(type -P wizer)" --allow-wasi --wasm-bulk-memory true --inherit-env true --init-func _initialize -o dist/bin.wasm "$hs_wasm_path"
