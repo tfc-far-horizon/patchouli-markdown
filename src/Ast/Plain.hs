@@ -10,8 +10,8 @@ newtype Plain = Plain
 instance ToJSON Plain where
   toJSON (Plain t) =
     object
-      [ "type" .:: "plain",
-        "content" .= t
+      [ "type" .:: "plain"
+      , "content" .= t
       ]
 
 instance AstNode Plain

@@ -8,8 +8,8 @@ newtype Paragraph = Paragraph [InlineAst]
 instance ToJSON Paragraph where
   toJSON (Paragraph lineFragments) =
     object
-      [ "type" .:: "paragraph",
-        "content"
+      [ "type" .:: "paragraph"
+      , "content"
           .= filter (\(InlineAst fragment) -> not $ shouldDrop fragment) lineFragments
       ]
 
