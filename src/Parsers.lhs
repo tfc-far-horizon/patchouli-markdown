@@ -395,6 +395,13 @@ count'number p = do
 code'block :: Analyser CodeBlock
 code'block = do
   indents <- count'number $ charUnit ('\t', False)
+  code'block'indented indents
+
+code'block'atIndent :: Int -> Analyser CodeBlock
+code'block'atIndent indents = indents `indented` code'block'indented indents
+
+code'block'indented :: Int -> Analyser CodeBlock
+code'block'indented indents = do
   charUnit ('`', False)
   ticks' <- count'number $ charUnit ('`', False)
   let ticks = ticks' + 1
@@ -454,7 +461,14 @@ try_else u v = try u <|> try v
 
 itemGroup :: Int -> Analyser ItemGroup
 itemGroup n =
-  exactGroup n `try_else` Plain'Item <$> n `indented` simpleLine
+  exactGroup n `try_else` (Plain'Item <$> plainItemLine n)
+
+plainItemLine :: Int -> Analyser Ast
+plainItemLine n =
+  choice . map try $
+    [ Ast <$> code'block'atIndent n,
+      n `indented` simpleLine
+    ]
 
 exactGroup :: Int -> Analyser ItemGroup
 exactGroup n = do
