@@ -1,0 +1,7 @@
+packages: .
+
+if arch(wasm32)
+  shared: True
+
+package jsaddle-wasm
+  flags: -eval-via-jsffi
