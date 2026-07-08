@@ -116,7 +116,7 @@ RUN source /root/.ghc-wasm/env \
   && ghcup set ghc "${GHC_WASM_VERSION}"
 
 # Prewarm the wasm Cabal index. Use the wasm wrapper, not plain cabal.
-RUN with-ghc-wasm-env wasm32-wasi-cabal update
+RUN with-ghc-wasm-env cabal update
 
 # Make interactive shells convenient without affecting earlier native Docker build steps.
 RUN echo 'source /root/.ghc-wasm/env' > /etc/profile.d/ghc-wasm.sh
@@ -127,7 +127,7 @@ WORKDIR /workspace
 # This Dockerfile is a toolchain image by default, so it does not COPY the project source.
 # If you want to bake igem-markdown dependencies into the image, add COPY lines before this RUN.
 RUN if [[ -f cabal.project ]] || compgen -G '*.cabal' > /dev/null; then \
-      with-ghc-wasm-env wasm32-wasi-cabal build compiler --only-dependencies; \
+      with-ghc-wasm-env cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg --with-hsc2hs=wasm32-wasi-hsc2hs build compiler --only-dependencies; \
     else \
       echo 'No Cabal project files copied; skipping project dependency prewarm.'; \
     fi
