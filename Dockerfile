@@ -40,39 +40,55 @@ ENV CROSS_EMULATOR=/root/.ghc-wasm/wasm-run/bin/wasm-run.mjs
 ENV NODE_PATH=/root/.ghc-wasm/nodejs/lib/node_modules
 ENV TEXMFHOME=/root/.texmf
 
+# base tools
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-    build-essential \
     ca-certificates \
     curl \
     file \
     git \
     gpg \
     jq \
-    ghc \
+    locales \
+    unzip \
+    xz-utils \
+    zstd \
+    zsh \
+  && rm -rf /var/lib/apt/lists/*
+
+# native build deps for ghcup/ghc/cabal/native packages
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    build-essential \
+    make \
+    patch \
+    pkg-config \
     libffi-dev \
     libffi8 \
     libgmp-dev \
     libgmp10 \
     libncurses-dev \
     libncurses5 \
-    locales \
-    make \
+    libtinfo5 \
+  && rm -rf /var/lib/apt/lists/*
+
+# js/wasm deps
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
     nodejs \
     npm \
-    patch \
-    pkg-config \
-    libtinfo5 \
+  && rm -rf /var/lib/apt/lists/*
+
+# TeX deps for lhs2TeX/manual/docs
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
     texlive-lang-chinese \
     texlive-latex-extra \
     texlive-xetex \
-    unzip \
-    xz-utils \
-    zstd \
-    zsh \
     texlive-science \
+    lmodern \
+    texlive-fonts-extra \
   && rm -rf /var/lib/apt/lists/*
-
 RUN locale-gen en_US.UTF-8
 
 # Install ghcup and a newer Cabal first so Hackage access is stable.
