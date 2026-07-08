@@ -49,15 +49,20 @@ RUN apt-get update \
     git \
     gpg \
     jq \
+    ghc \
     libffi-dev \
+    libffi8 \
     libgmp-dev \
+    libgmp10 \
     libncurses-dev \
+    libncurses5 \
     locales \
     make \
     nodejs \
     npm \
     patch \
     pkg-config \
+    libtinfo5 \
     texlive-lang-chinese \
     texlive-latex-extra \
     texlive-xetex \
@@ -69,29 +74,29 @@ RUN apt-get update \
 
 RUN locale-gen en_US.UTF-8
 
-# Install ghcup and its default native toolchain first so we can build lhs2tex.
-RUN curl --proto '=https' --tlsv1.2 -fsSL https://get-ghcup.haskell.org \
-  | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 sh
+# Install ghcup and a newer Cabal first so Hackage access is stable.
+RUN curl -fsSL https://get-ghcup.haskell.org \
+  | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 \
+    BOOTSTRAP_HASKELL_MINIMAL=1 \
+    BOOTSTRAP_HASKELL_INSTALL_NO_STACK=1 \
+    sh
 
-RUN source /root/.ghcup/env \
-  && ghcup install cabal 3.14.2.0 \
-  && ghcup set cabal 3.14.2.0 \
-  && cabal update \
-  && cabal install lhs2tex --overwrite-policy=always
+# Use the ghcup-managed Haskell toolchain for the bootstrap-time native build.
+RUN ghcup install cabal 3.14.2.0 --set -f
+
+RUN cabal update && echo done updating && \
+  cabal install lhs2tex --overwrite-policy=always
 
 # Install the wasm toolchain used by this project.
 RUN curl -fsSL https://gitlab.haskell.org/haskell-wasm/ghc-wasm-meta/-/raw/master/bootstrap.sh \
   | SKIP_GHC=1 sh
 
-RUN source /root/.ghcup/env \
-  && ghcup config add-release-channel https://gitlab.haskell.org/haskell-wasm/ghc-wasm-meta/-/raw/master/ghcup-wasm-0.0.9.yaml \
+RUN ghcup config add-release-channel https://gitlab.haskell.org/haskell-wasm/ghc-wasm-meta/-/raw/master/ghcup-wasm-0.0.9.yaml \
   && ghcup install ghc wasm32-wasi-9.12 -- ${CONFIGURE_ARGS} \
   && ghcup set ghc wasm32-wasi-9.12
 
-# Provide the same nvm-based Node.js entrypoint the Makefile expects.
-RUN git clone --depth 1 https://github.com/nvm-sh/nvm.git "$NVM_DIR" \
-  && source "$NVM_DIR/nvm.sh" \
-  && nvm install node \
-  && nvm alias default node
+# Prewarm the cabal stores so CI only has to build the final targets.
+RUN wasm32-wasi-cabal update \
+  && wasm32-wasi-cabal build compiler  --only-dependencies
 
 WORKDIR /workspace
