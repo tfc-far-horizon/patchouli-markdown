@@ -70,6 +70,7 @@ RUN apt-get update \
     xz-utils \
     zstd \
     zsh \
+    texlive-science \
   && rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen en_US.UTF-8
