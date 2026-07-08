@@ -73,8 +73,8 @@ RUN curl -fsSL https://get-ghcup.haskell.org \
     sh
 
 # Native Haskell toolchain. This must run before any wasm environment is sourced.
-RUN ghcup install ghc "${GHC_NATIVE_VERSION}" --set -f
-RUN ghcup install cabal "${CABAL_VERSION}" --set -f
+RUN ghcup install ghc "${GHC_NATIVE_VERSION}" --set -f && \
+    ghcup install cabal "${CABAL_VERSION}" --set -f
 
 # Native lhs2TeX install. This intentionally uses native cabal/ghc, not wasm CC/AR/LD.
 RUN cabal update \
@@ -83,6 +83,13 @@ RUN cabal update \
 # Install ghc-wasm-meta support tools, but skip GHC here because we install it with ghcup below.
 RUN curl -fsSL https://gitlab.haskell.org/haskell-wasm/ghc-wasm-meta/-/raw/master/bootstrap.sh \
   | SKIP_GHC=1 sh
+
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen \
+  && locale-gen en_US.UTF-8
+
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
 
 # Small helper: source ghc-wasm-meta's generated env only for commands that need it.
 # This avoids globally poisoning native builds with wasm CC/AR/LD.
