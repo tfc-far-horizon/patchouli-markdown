@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM texlive/texlive:latest-full
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG IMAGE_SOURCE
@@ -63,18 +63,6 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     nodejs \
     npm \
-  && rm -rf /var/lib/apt/lists/*
-
-# TeX/lhs2TeX documentation dependencies.
-# lhs2tex's Cabal setup builds its guide; these avoid missing lmodern/stmaryrd/newtx/etc.
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
-    texlive-lang-chinese \
-    texlive-latex-extra \
-    texlive-xetex \
-    texlive-science \
-    lmodern \
-    texlive-fonts-extra \
   && rm -rf /var/lib/apt/lists/*
 
 # Install ghcup without letting it install a default toolchain implicitly.
