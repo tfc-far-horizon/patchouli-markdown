@@ -98,10 +98,12 @@ RUN curl -fsSL https://get-ghcup.haskell.org \
     BOOTSTRAP_HASKELL_INSTALL_NO_STACK=1 \
     sh
 
+RUN ghcup install ghc 9.12.2 --set -f
+
 # Use the ghcup-managed Haskell toolchain for the bootstrap-time native build.
 RUN ghcup install cabal 3.14.2.0 --set -f
 
-RUN cabal update && echo done updating && \
+RUN cabal update && \
   cabal install lhs2tex --overwrite-policy=always
 
 # Install the wasm toolchain used by this project.
