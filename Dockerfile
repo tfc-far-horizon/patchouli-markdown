@@ -54,8 +54,8 @@ RUN apt-get update \
     libgmp-dev \
     libgmp10 \
     libncurses-dev \
-    libncurses5 \
-    libtinfo5 \
+    libncurses6 \
+    libtinfo6 \
   && rm -rf /var/lib/apt/lists/*
 
 # JavaScript/WASM-side tools that the project build may call directly.
