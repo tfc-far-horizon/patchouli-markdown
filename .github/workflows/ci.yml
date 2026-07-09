@@ -29,30 +29,11 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
+    env:
+      GHC_WASM_HOME: /root/.ghc-wasm
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      # - name: Configure wasm Cabal project
-      #   run: |
-      #     set -euo pipefail
-
-      #     if [[ -f cabal.project ]]; then
-      #       cat > cabal.project.local <<'EOF'
-      #     shared: True
-
-      #     package jsaddle-wasm
-      #       flags: -eval-via-jsffi
-      #     EOF
-      #     else
-      #       cat > cabal.project <<'EOF'
-      #     packages: .
-      #     shared: True
-
-      #     package jsaddle-wasm
-      #       flags: -eval-via-jsffi
-      #     EOF
-      #     fi
 
       - name: Build wasm artifacts and docs
         run: |
