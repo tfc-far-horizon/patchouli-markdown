@@ -275,3 +275,7 @@ TSWLatexianTemp*
 
 # standalone packages
 *.sta
+
+# agents
+.agent
+.codex

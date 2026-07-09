@@ -36,9 +36,10 @@ DOCS = docs
 
 
 
-all: wasm-dists docs
+all: update wasm-dists docs
 
-
+update:
+	cabal update
 
 
 docs: docspath docsmade
@@ -94,7 +95,7 @@ cleandocs:
 restart: cleandocs
 	-rm -rf $(DIST)
 
-.PHONY: all cleandocs restart docspath distpath bin
+.PHONY: all cleandocs restart docspath distpath bin update
 
 
 bin:
