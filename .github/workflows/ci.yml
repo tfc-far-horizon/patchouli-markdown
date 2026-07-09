@@ -33,56 +33,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare wasm Cabal wrapper
-        run: |
-          set -euo pipefail
+      # - name: Configure wasm Cabal project
+      #   run: |
+      #     set -euo pipefail
 
-          command -v with-ghc-wasm-env
+      #     if [[ -f cabal.project ]]; then
+      #       cat > cabal.project.local <<'EOF'
+      #     shared: True
 
-          if ! with-ghc-wasm-env bash -lc 'command -v wasm32-wasi-cabal >/dev/null 2>&1'; then
-            cat > /usr/local/bin/wasm32-wasi-cabal <<'EOF'
-          #!/usr/bin/env bash
-          set -euo pipefail
-          exec cabal \
-            --with-compiler=wasm32-wasi-ghc \
-            --with-hc-pkg=wasm32-wasi-ghc-pkg \
-            --with-hsc2hs=wasm32-wasi-hsc2hs \
-            "$@"
-          EOF
-            chmod +x /usr/local/bin/wasm32-wasi-cabal
-          fi
+      #     package jsaddle-wasm
+      #       flags: -eval-via-jsffi
+      #     EOF
+      #     else
+      #       cat > cabal.project <<'EOF'
+      #     packages: .
+      #     shared: True
 
-          with-ghc-wasm-env bash -lc '
-            set -euo pipefail
-            command -v wasm32-wasi-ghc
-            command -v wasm32-wasi-ghc-pkg
-            command -v wasm32-wasi-hsc2hs
-            command -v wasm32-wasi-cabal
-            command -v node
-            command -v lhs2TeX
-            command -v xelatex
-          '
-
-      - name: Configure wasm Cabal project
-        run: |
-          set -euo pipefail
-
-          if [[ -f cabal.project ]]; then
-            cat > cabal.project.local <<'EOF'
-          shared: True
-
-          package jsaddle-wasm
-            flags: -eval-via-jsffi
-          EOF
-          else
-            cat > cabal.project <<'EOF'
-          packages: .
-          shared: True
-
-          package jsaddle-wasm
-            flags: -eval-via-jsffi
-          EOF
-          fi
+      #     package jsaddle-wasm
+      #       flags: -eval-via-jsffi
+      #     EOF
+      #     fi
 
       - name: Build wasm artifacts and docs
         run: |
