@@ -17,7 +17,7 @@ concurrency:
 env:
   # Override this repository variable if you publish the image under another tag.
   # Expected example: ghcr.io/tfc-far-horizon/patchouli-markdown:ghcr
-  CI_IMAGE: ${{ vars.WASM_IMAGE || 'ghcr.io/tfc-far-horizon/patchouli-markdown:ghcr' }}
+  CI_IMAGE: ${{ vars.WASM_IMAGE || 'ghcr.io/tfc-far-horizon/igem-markdown-ci' }}
   GHC_NATIVE_VERSION: "9.12.2"
 
 jobs:
@@ -25,7 +25,7 @@ jobs:
     name: Build wasm artifacts
     runs-on: ubuntu-latest
     container:
-      image: ${{ vars.WASM_IMAGE || 'ghcr.io/tfc-far-horizon/patchouli-markdown:ghcr' }}
+      image: ${{ vars.WASM_IMAGE || 'ghcr.io/tfc-far-horizon/igem-markdown-ci'  }}
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
@@ -105,7 +105,7 @@ jobs:
     name: Build native compiler
     runs-on: ubuntu-latest
     container:
-      image: ${{ vars.WASM_IMAGE || 'ghcr.io/tfc-far-horizon/patchouli-markdown:ghcr' }}
+      image: ${{ vars.WASM_IMAGE || 'ghcr.io/tfc-far-horizon/igem-markdown-ci'  }}
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
