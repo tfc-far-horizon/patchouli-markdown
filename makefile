@@ -7,22 +7,26 @@ BLUE :=
 export SHELL=/bin/zsh
 TEXTEMPDIR = texworks
 
+GHC_WASM_HOME ?= $(HOME)/.ghc-wasm
 
-define CABAL
-	cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg --with-hsc2hs=wasm32-wasi-hsc2hs $(1) $(2) $(3)
-endef
-
+WIZER_BIN  ?= $(GHC_WASM_HOME)/wasmtime/bin/wizer
+WASM_OPT   ?= $(GHC_WASM_HOME)/binaryen/bin/wasm-opt
+WASM_TOOLS ?= $(GHC_WASM_HOME)/wasmtime/bin/wasm-tools
 
 define WIZER
-	env -i GHCRTS=-H64m ~/.ghc-wasm/wasmtime/bin/wizer \
+	env -i GHCRTS=-H64m "$(WIZER_BIN)" \
 		--allow-wasi \
 		--wasm-bulk-memory true \
 		--inherit-env true \
 		--init-func _initialize \
-		-o $(2) \
-		$(1) && \
-	~/.ghc-wasm/binaryen/bin/wasm-opt $(2) -o $(2); \
-	~/.ghc-wasm/wasmtime/bin/wasm-tools strip -o $(2) $(2);
+		-o "$(2)" \
+		"$(1)" && \
+	"$(WASM_OPT)" "$(2)" -o "$(2)" && \
+	"$(WASM_TOOLS)" strip -o "$(2)" "$(2)"
+endef
+
+define CABAL
+	cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg --with-hsc2hs=wasm32-wasi-hsc2hs $(1) $(2) $(3)
 endef
 
 
