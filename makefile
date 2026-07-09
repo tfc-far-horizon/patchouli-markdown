@@ -76,7 +76,7 @@ distpath:
 	@mkdir -p $(DIST)
 
 dist/wizer.wasm: $(DIST)/analyser.wasm
-	$(call WIZER, $<, $@)
+	$(call WIZER,$<,$@)
 
 $(DIST)/%.wasm: $(wildcard src/*.lhs) $(wildcard src/*.hs) igem-markdown.cabal
 	@echo 
