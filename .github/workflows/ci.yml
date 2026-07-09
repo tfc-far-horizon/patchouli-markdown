@@ -8,46 +8,37 @@ on:
 
 permissions:
   contents: read
+  packages: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  # Override this repository variable if you publish the image under another tag.
+  # Expected example: ghcr.io/tfc-far-horizon/patchouli-markdown:ghcr
+  CI_IMAGE: ${{ vars.WASM_IMAGE || 'ghcr.io/tfc-far-horizon/igem-markdown-ci' }}
+  GHC_NATIVE_VERSION: "9.12.2"
+
 jobs:
   build-wasm:
     name: Build wasm artifacts
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.WASM_IMAGE == ''
-    # Fallback for the bootstrap period before the GHCR image is published.
-    # This expects a self-hosted runner with the wasm/TeX toolchain installed.
-    runs-on: self-hosted
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Build
-        run: make all
-
-      - name: Upload dist
-        uses: actions/upload-artifact@v4
-        with:
-          name: wasm-dist
-          path: |
-            dist/
-            docs/
-          if-no-files-found: error
-
-  build-wasm-ghcr:
-    name: Build wasm artifacts from GHCR image
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.WASM_IMAGE != ''
     runs-on: ubuntu-latest
     container:
-      image: ${{ vars.WASM_IMAGE }}
+      image: ${{ vars.WASM_IMAGE || 'ghcr.io/tfc-far-horizon/igem-markdown-ci'  }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    env:
+      GHC_WASM_HOME: /root/.ghc-wasm
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build
-        run: make all
+      - name: Build wasm artifacts and docs
+        run: |
+          set -euo pipefail
+          with-ghc-wasm-env make all
 
       - name: Upload dist
         uses: actions/upload-artifact@v4
@@ -61,23 +52,19 @@ jobs:
   build-linux:
     name: Build native compiler
     runs-on: ubuntu-latest
+    container:
+      image: ${{ vars.WASM_IMAGE || 'ghcr.io/tfc-far-horizon/igem-markdown-ci'  }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Haskell
-        uses: haskell-actions/setup@v2.11.0
-        with:
-          ghc-version: 9.6.7
-          cabal-version: 3.14.2.0
-
       - name: Build compiler
         run: |
           set -euo pipefail
-          cabal build compiler
-          mkdir -p bindist
-          bin_path="$(cabal list-bin compiler)"
-          cp "$bin_path" ./bindist/
+          make bin
 
       - name: Upload bindist
         uses: actions/upload-artifact@v4

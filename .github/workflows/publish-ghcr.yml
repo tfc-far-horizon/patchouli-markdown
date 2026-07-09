@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - ghcr
     paths:
       - Dockerfile
       - .github/workflows/publish-ghcr.yml
