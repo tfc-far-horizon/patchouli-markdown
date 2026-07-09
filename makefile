@@ -14,15 +14,15 @@ endef
 
 
 define WIZER
-	env -i GHCRTS=-H64m $$HOME/.ghc-wasm/wasmtime/bin/wizer \
+	env -i GHCRTS=-H64m ~/.ghc-wasm/wasmtime/bin/wizer \
 		--allow-wasi \
 		--wasm-bulk-memory true \
 		--inherit-env true \
 		--init-func _initialize \
 		-o $(2) \
 		$(1) && \
-	$$HOME/.ghc-wasm/binaryen/bin/wasm-opt $(2) -o $(2); \
-	$$HOME/.ghc-wasm/wasmtime/bin/wasm-tools strip -o $(2) $(2);
+	~/.ghc-wasm/binaryen/bin/wasm-opt $(2) -o $(2); \
+	~/.ghc-wasm/wasmtime/bin/wasm-tools strip -o $(2) $(2);
 endef
 
 
@@ -98,7 +98,7 @@ restart: cleandocs
 .PHONY: all cleandocs restart docspath distpath bin update
 
 
-bin:
+bin: update
 	-mkdir ./bindist
 	cabal build compiler
 	cabal list-bin compiler | xargs -I {} cp {} ./bindist
