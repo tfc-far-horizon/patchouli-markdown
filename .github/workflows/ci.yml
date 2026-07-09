@@ -57,10 +57,7 @@ jobs:
       - name: Build wasm artifacts and docs
         run: |
           set -euo pipefail
-          with-ghc-wasm-env bash -lc '
-            set -euo pipefail
-            make all
-          '
+          with-ghc-wasm-env make all
 
       - name: Upload dist
         uses: actions/upload-artifact@v4
@@ -83,20 +80,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select native GHC
-        run: |
-          set -euo pipefail
-          ghcup set ghc "${GHC_NATIVE_VERSION}"
-          ghc --version
-          cabal --version
-
       - name: Build compiler
         run: |
           set -euo pipefail
-          cabal build compiler
-          mkdir -p bindist
-          bin_path="$(cabal list-bin compiler)"
-          cp "$bin_path" ./bindist/
+          make bin
 
       - name: Upload bindist
         uses: actions/upload-artifact@v4

@@ -83,7 +83,6 @@ $(DIST)/%.wasm: $(wildcard src/*.lhs) $(wildcard src/*.hs) igem-markdown.cabal
 
 NODE ?= node
 $(DIST)/ghc_wasm_jsffi.mjs: $(DIST)/analyser.wasm
-
 	$(NODE) "$$(wasm32-wasi-ghc --print-libdir)/post-link.mjs" -i "$<" -o "$@"
 
 
@@ -102,5 +101,4 @@ bin:
 	-mkdir ./bindist
 	cabal build compiler
 	cabal list-bin compiler | xargs -I {} cp {} ./bindist
-
 
